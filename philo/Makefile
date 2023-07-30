@@ -6,13 +6,17 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/07/30 21:48:09 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/07/30 23:13:33 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS =	main.c
+SRCS =	main.c \
+		error.c \
+		util.c \
 		
 OBJS = 	${SRCS:.c=.o}
+
+TOTAL_OBJS = ${OBJS}
 
 CC = cc
 
@@ -21,7 +25,7 @@ CFLAGS = -Wall -Wextra -Werror
 NAME = philo
 
 ${NAME} : ${TOTAL_OBJS}
-	${CC} ${TOTAL_OBJS}  -o $@
+	${CC} ${CFLAGS} ${TOTAL_OBJS}  -o $@
 
 %.o :%.c
 	${CC} ${CFLAGS} -c -I. $< -o $@
