@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/07/30 23:16:00 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/03 18:46:47 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,60 @@
 
 void* thread_function(void* arg)
 {
-    t_pass *value;
+    t_pass  *value;
+    t_philo *data;
+    int     idx;
+    int     first_pick;
+    int     second_pick;
+    struct timeval time_lapse;
+    int     eat_cnt;
 
     value = (t_pass *)arg;
-    printf("idx : %d, left_first : %s\n", value->idx, value->left_first ? "True" : "false");
-
+    data = value->data;
+    idx = value->idx;
+    if (idx % 2 == 0)
+    {
+        first_pick = idx;
+        second_pick = (idx + 1) % data->philo_num;
+    }
+    else
+    {
+        first_pick = (idx + 1) % data->philo_num;
+        second_pick = idx;
+    }
+    eat_cnt = 0;
+    while (data->s_flag == FALSE);
+    while (1)
+    {
+        while (data->fork[first_pick] != -1);
+        pthread_mutex_lock(&data->mutex);
+        data->fork[first_pick] = idx;
+        pthread_mutex_unlock(&data->mutex);
+        while (data->fork[second_pick] != -1);
+        pthread_mutex_lock(&data->mutex);
+        data->fork[second_pick] = idx;
+        pthread_mutex_unlock(&data->mutex);
+        gettimeofday(&time_lapse, T_NULL);
+        printf("%d ms %d has taken a fork\n", time_lapse.tv_usec - data->start.tv_usec, idx);
+        gettimeofday(&time_lapse, T_NULL);
+        printf("%d ms %d is eating\n", time_lapse.tv_usec - data->start.tv_usec, idx);
+        usleep(data->e_time);
+        data->fork[first_pick] = -1;
+        data->fork[second_pick] = -1;
+        if (++eat_cnt >= data->eat_cnt)
+            break;
+        gettimeofday(&time_lapse, T_NULL);
+        printf("%d ms %d is sleeping\n", time_lapse.tv_usec - data->start.tv_usec, idx);
+        usleep(data->s_time);
+        gettimeofday(&time_lapse, T_NULL);
+        printf("%d ms %d is thinkig\n", time_lapse.tv_usec - data->start.tv_usec, idx);
+    }
     return (T_NULL);
 }
 
 int main(int argc, char **argv)
 {
-    t_philo data;
+    t_philo data; 
 
     if (argc != 5 && argc != 6)
     {
@@ -49,22 +92,22 @@ int main(int argc, char **argv)
 
     t_pass  *pass;
     int idx;
-    t_bool left_first;
     
     pass = (t_pass *)malloc(sizeof(t_pass) * data.philo_num);
     if (pass ==T_NULL)
     {
         philo_free(&data);
         err_msg("pthread create error!", 1);
-    }    
+    }
     idx = -1;
-    left_first = FALSE;
+    while (++idx < data.philo_num)
+        data.fork[idx] = -1;
+    
+    idx = -1;
     while (++idx < data.philo_num)
     {
         pass[idx].data = &data;
         pass[idx].idx = idx;
-        left_first = !left_first;
-        pass[idx].left_first = !left_first;
         if (pthread_create(&data.philo[idx], NULL, thread_function, &pass[idx]) != 0)
         {
             philo_free(&data);
@@ -72,7 +115,8 @@ int main(int argc, char **argv)
             err_msg("pthread create error!", 1);
         }    
     }
-
+    gettimeofday(&data.start, T_NULL);
+    data.s_flag = TRUE;
 
     idx = -1;
     while (++idx < data.philo_num)

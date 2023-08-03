@@ -48,6 +48,8 @@ void	philo_init(t_philo *data)
 	data->eat_cnt = -1;
 	data->philo = T_NULL;
 	data->fork = T_NULL;
+	data->s_flag = FALSE;
+	data->d_flag = FALSE;
 }
 
 int	ft_atoi_int(const char *str)

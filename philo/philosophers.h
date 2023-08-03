@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/07/30 23:10:02 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/03 18:41:05 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <memory.h>
 # include <unistd.h>
 # include <sys/time.h>
-#include <limits.h>
+# include <limits.h>
 
 # if !defined(TRUE) && !defined(FALSE)
 #  define TRUE 1
@@ -41,13 +41,14 @@ typedef struct s_philo
 	pthread_t	*philo;
 	int			*fork;
 	pthread_mutex_t mutex;
-	int		cur_idx;
+	struct timeval start;
+	t_bool	s_flag;
+	t_bool	d_flag;
 }	t_philo;
 
 typedef struct s_pass
 {
 	int		idx;
-	t_bool	left_first;
 	t_philo	*data;
 }	t_pass;
 
