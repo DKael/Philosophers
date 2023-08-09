@@ -12,45 +12,8 @@
 
 #include "philosophers.h"
 
-void	arg_init(t_philo *data, int argc, char **argv, int idx)
-{
-	while (++idx < argc)
-	{
-		if (argv[idx][0] == '-')
-			err_msg("Invalid input! Input must be positive.\n", 1);
-	}
-	data->philo_num = ft_atoi_int(argv[1]);
-	if (data->philo_num == 0 && argv[1][0] == '0')
-		err_msg("Invalid input! Wrong range of input value.\n", 1);
-	data->d_time = ft_atoi_int(argv[2]);
-	if (data->d_time == 0 && argv[1][0] == '0')
-		err_msg("Invalid input! Wrong range of input value.\n", 1);
-	data->e_time = ft_atoi_int(argv[3]);
-	if (data->e_time == 0 && argv[1][0] == '0')
-		err_msg("Invalid input! Wrong range of input value.\n", 1);
-	data->s_time = ft_atoi_int(argv[4]);
-	if (data->s_time == 0 && argv[1][0] == '0')
-		err_msg("Invalid input! Wrong range of input value.\n", 1);
-	if (argc == 6)
-	{
-		data->eat_cnt = ft_atoi_int(argv[5]);
-		if (data->eat_cnt == 0 && argv[1][0] == '0')
-			err_msg("Invalid input! Wrong range of input value.\n", 1);
-	}
-}
-
-void	philo_init(t_philo *data)
-{
-	data->philo_num = -1;
-	data->d_time = -1;
-	data->e_time = -1;
-	data->s_time = -1;
-	data->eat_cnt = -1;
-	data->philo = T_NULL;
-	data->fork = T_NULL;
-	data->s_flag = FALSE;
-	data->d_flag = FALSE;
-}
+static char	*case_pos(int n, int digit);
+static char	*case_neg(int n, int digit);
 
 int	ft_atoi_int(const char *str)
 {
@@ -76,4 +39,105 @@ int	ft_atoi_int(const char *str)
 	}
 	return ((int)nb * sign);
 }
-;
+
+t_bool	ft_isdecimal(char *str)
+{
+	int	idx;
+
+	idx = 0;
+	if (str[0] == '-' || str[0] == '+')
+		idx++;
+	while (str[idx] != '\0')
+	{
+		if (!('0' <= str[idx] && str[idx] <= '9'))
+			return (FALSE);
+		idx++;
+	}
+	return (TRUE);
+}
+
+char	*ft_itoa(int n)
+{
+	int		digit;
+	int		temp_n;
+	char	*result;
+
+	if (n == 0)
+	{
+		result = (char *)malloc(sizeof(char) * 2);
+		if (result == NULL)
+			return (NULL);
+		result[0] = '0';
+		result[1] = '\0';
+		return (result);
+	}
+	temp_n = n;
+	digit = 0;
+	while (temp_n != 0)
+	{
+		digit++;
+		temp_n /= 10;
+	}
+	if (n > 0)
+		return (case_pos(n, digit));
+	else
+		return (case_neg(n, digit));
+}
+
+static char	*case_pos(int n, int digit)
+{
+	char	*result;
+
+	result = (char *)malloc(sizeof(char) * (digit + 1));
+	if (result == NULL)
+		return (NULL);
+	result[digit--] = '\0';
+	while (n != 0)
+	{
+		result[digit--] = (n % 10) + '0';
+		n /= 10;
+	}
+	return (result);
+}
+
+static char	*case_neg(int n, int digit)
+{
+	char	*result;
+
+	result = (char *)malloc(sizeof(char) * (digit + 2));
+	if (result == NULL)
+		return (NULL);
+	result[0] = '-';
+	result[digit + 1] = '\0';
+	while (n != 0)
+	{
+		result[digit--] = (-1) * (n % 10) + '0';
+		n /= 10;
+	}
+	return (result);
+}
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	size_t	index;
+	size_t	total_size;
+	void	*result;
+	char	*temp_ptr;
+
+	index = 0;
+	if (count == 0 || size == 0)
+		return (malloc(0));
+	total_size = count * size;
+	if (ULLONG_MAX / size < count)
+		return ((NULL));
+	result = malloc(total_size);
+	if (result == NULL)
+		return (NULL);
+	temp_ptr = (char *)result;
+	while (index < total_size)
+	{
+		temp_ptr[index] = 0;
+		index++;
+	}
+	return (result);
+}

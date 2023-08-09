@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/03 18:41:05 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/09 16:46:04 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <unistd.h>
 # include <sys/time.h>
 # include <limits.h>
+# include "double_linked_list.h"
 
 # if !defined(TRUE) && !defined(FALSE)
 #  define TRUE 1
@@ -33,30 +34,36 @@ typedef int	t_bool;
 
 typedef struct s_philo
 {
+	int				idx;
+	int				first_pick;
+    int				second_pick;
+	struct timeval	last_eat;
+	t_arg			*arg;
+}	t_philo;
+
+typedef struct s_arg
+{
 	int	philo_num;
 	int	d_time;
 	int	e_time;
 	int	s_time;
 	int	eat_cnt;
-	pthread_t	*philo;
-	int			*fork;
-	pthread_mutex_t mutex;
-	struct timeval start;
+	pthread_t		*philo;
+	pthread_mutex_t	*fork;
+	struct timeval	start;
+	struct timeval	now;
 	t_bool	s_flag;
-	t_bool	d_flag;
-}	t_philo;
-
-typedef struct s_pass
-{
-	int		idx;
-	t_philo	*data;
-}	t_pass;
+	int	d_flag;
+}	t_arg;
 
 void	err_init(char *argv);
 void	err_msg(const char *msg, int exit_code);
-void	philo_free(t_philo *data);
+void	arg_free(t_arg *data);
+void* thread_function(void* arg);
 
-void	arg_init(t_philo *data, int argc, char **argv, int idx);
-void	philo_init(t_philo *data);
+void	arg_init(t_arg *data, int argc, char **argv);
 int		ft_atoi_int(const char *str);
+t_bool	ft_isdecimal(char *str);
+char	*ft_itoa(int n);
+void	*ft_calloc(size_t count, size_t size);
 # endif

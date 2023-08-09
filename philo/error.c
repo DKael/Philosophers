@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 22:06:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/07/30 23:09:33 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/09 16:44:43 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ void	err_msg(const char *msg, int exit_code)
 	exit(exit_code);
 }
 
-void	philo_free(t_philo *data)
+void	arg_free(t_arg *arg)
 {
-	free(data->philo);
-	free(data->fork);
+	free(arg->philo);
+	free(arg->fork);
 }
