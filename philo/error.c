@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 22:06:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/09 16:44:43 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/13 18:06:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,9 @@ void	err_init(char *argv)
 	g_program_name = argv;
 }
 
-void	err_msg(const char *msg, int exit_code)
+void	err_msg(const char *msg)
 {
 	printf("%s: %s\n", g_program_name, msg);
-	exit(exit_code);
 }
 
 void	arg_free(t_arg *arg)
