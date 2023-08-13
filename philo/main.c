@@ -6,140 +6,193 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/09 16:56:01 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/13 18:06:03 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-void* thread_function(void* arg)
+void *print_thread_func(void *arg)
 {
-    t_philo  *value;
-    t_philo *arg;
-    int     idx;
-    
-    struct timeval time_lapse;
-    int     eat_cnt;
+}
 
-    value = (t_philo *)arg;
-    arg = value->arg;
-    idx = value->idx;
-    if (idx % 2 == 0)
+void *time_thread_func(void *arg)
+{
+}
+
+void *exit_thread(t_arg *arg, t_thread_status status)
+{
+    if (status == DEATH)
+        arg->da_flag |= DEATH;
+    else if (status == ABORT)
+        arg->da_flag |= ABORT;
+    return (T_NULL);
+}
+
+t_bool report(t_philo *value, t_philo_status status)
+{
+    t_log *log;
+    t_dllnode *log_node;
+
+    log = (t_log *)malloc(sizeof(t_log));
+    if (log == T_NULL)
+        return (FALSE);
+    if (gettimeofday(&log->time, T_NULL) != 0)
     {
-        first_pick = idx;
-        second_pick = (idx + 1) % arg->philo_num;
+        free(log);
+        return (FALSE);
     }
-    else
+    log->who = value->idx + 1;
+    log->status = status;
+    log_node = dll_new_node(log);
+    if (log_node == T_NULL)
     {
-        first_pick = (idx + 1) % arg->philo_num;
-        second_pick = idx;
+        free(log);
+        return (FALSE);
     }
+    dll_add_tail(&value->logs, log_node);
+    return (TRUE);
+}
+
+void *philo_thread_func(void *param)
+{
+    t_philo *value;
+    t_arg *arg;
+    t_log *log;
+    int eat_cnt;
+    int cnt;
+
+    value = (t_philo *)param;
+    arg = (t_arg *)value->arg;
     eat_cnt = 0;
-    while (arg->s_flag == FALSE);
-    while (1)
+    while (arg->start_flag == FALSE)
     {
-        while (arg->fork[first_pick] != -1);
-        pthread_mutex_lock(&arg->mutex);
-        arg->fork[first_pick] = idx;
-        pthread_mutex_unlock(&arg->mutex);
-        while (arg->fork[second_pick] != -1);
-        pthread_mutex_lock(&arg->mutex);
-        arg->fork[second_pick] = idx;
-        pthread_mutex_unlock(&arg->mutex);
-        gettimeofday(&time_lapse, T_NULL);
-        printf("%d ms %d has taken a fork\n", time_lapse.tv_usec - arg->start.tv_usec, idx);
-        gettimeofday(&time_lapse, T_NULL);
-        printf("%d ms %d is eating\n", time_lapse.tv_usec - arg->start.tv_usec, idx);
-        usleep(arg->e_time);
-        arg->fork[first_pick] = -1;
-        arg->fork[second_pick] = -1;
-        if (++eat_cnt >= arg->eat_cnt)
-            break;
-        gettimeofday(&time_lapse, T_NULL);
-        printf("%d ms %d is sleeping\n", time_lapse.tv_usec - arg->start.tv_usec, idx);
-        usleep(arg->s_time);
-        gettimeofday(&time_lapse, T_NULL);
-        printf("%d ms %d is thinkig\n", time_lapse.tv_usec - arg->start.tv_usec, idx);
+        if (usleep(10) != 0)
+            return (exit_thread(arg, ABORT));
+    }
+    while (arg->da_flag == 0)
+    {
+        if (pthread_mutex_lock(value->first_fork) != 0)
+            return (exit_thread(arg, ABORT));
+        if (pthread_mutex_lock(value->second_fork) != 0)
+            return (exit_thread(arg, ABORT));
+        if (report(value, GET_FORK) == FALSE)
+            return (exit_thread(arg, ABORT));
+        if (report(value, EATING) == FALSE)
+            return (exit_thread(arg, ABORT));
+        cnt = -1;
+        while (++cnt < arg->e_time)
+            usleep(1000);
+        if (pthread_mutex_unlock(value->first_fork) != 0)
+            return (exit_thread(arg, ABORT));
+        if (pthread_mutex_unlock(value->second_fork) != 0)
+            return (exit_thread(arg, ABORT));
+        if (gettimeofday(&value->last_eat, T_NULL) != 0)
+            return (exit_thread(arg, ABORT));
+        if (arg->have_to_eat != -1 && ++eat_cnt == arg->have_to_eat)
+            return (T_NULL);
+        if (report(value, SLEEPING) == FALSE)
+            return (exit_thread(arg, ABORT));
+        cnt = -1;
+        while (++cnt < arg->s_time)
+            usleep(1000);
+        if (report(value, THINKING) == FALSE)
+            return (exit_thread(arg, ABORT));
     }
     return (T_NULL);
 }
 
 int main(int argc, char **argv)
 {
-    t_arg arg; 
+    t_arg arg;
 
     if (argc != 5 && argc != 6)
     {
         printf("Usage : %s number_of_philosophers \
         time_to_die time_to_eat time_to_sleep \
-        [number_of_times_each_philosopher_must_eat]\n", argv[0]);
+        [number_of_times_each_philosopher_must_eat]\n",
+               argv[0]);
         return (1);
     }
     err_init(argv[0]);
-    arg_init(&arg, argc, argv);
-    arg.philo = (pthread_t *)ft_calloc(arg.philo_num, sizeof(pthread_t));
+    if (arg_init(&arg, argc, argv) != 0)
+        return (1);
+    arg.philo = (t_philo *)ft_calloc(arg.philo_num, sizeof(t_philo));
     if (arg.philo == T_NULL)
-        err_msg("malloc error!", 1);
-	arg.fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * arg.philo_num);
+    {
+        err_msg("malloc error!");
+        return (1);
+    }
+    arg.fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * arg.philo_num);
     if (arg.fork == T_NULL)
     {
         free(arg.philo);
-        err_msg("malloc error!", 1);
+        err_msg("malloc error!");
+        return (1);
     }
 
-
-
-
-
     int idx;
-    
-    pthread_mutex_init(&arg.mutex,NULL);
 
-    t_philo  *philo;
-    int idx;
-    
-    philo = (t_philo *)malloc(sizeof(t_philo) * arg.philo_num);
-    if (philo ==T_NULL)
-    {
-        philo_free(&arg);
-        err_msg("pthread create error!", 1);
-    }
-    idx = -1;
-    while (++idx < arg.philo_num)
-        arg.fork[idx] = -1;
-    
     idx = -1;
     while (++idx < arg.philo_num)
     {
-        philo[idx].arg = &arg;
-        philo[idx].idx = idx;
-        if (pthread_create(&arg.philo[idx], NULL, thread_function, &philo[idx]) != 0)
+        arg.philo[idx].idx = idx;
+        if (idx % 2 == 0)
         {
-            philo_free(&arg);
-            free(philo);
-            err_msg("pthread create error!", 1);
-        }    
+            arg.philo[idx].first_fork = &arg.fork[idx];
+            arg.philo[idx].second_fork = &arg.fork[idx + 1 % arg.philo_num];
+        }
+        else
+        {
+            arg.philo[idx].first_fork = &arg.fork[idx + 1 % arg.philo_num];
+            arg.philo[idx].second_fork = &arg.fork[idx];
+        }
+        dll_init(&arg.philo[idx].logs);
+        arg.philo[idx].arg = &arg;
+        if (pthread_create(&arg.philo[idx].thrd, NULL, philo_thread_func, &arg.philo[idx]) != 0)
+        {
+            arg_free(&arg);
+            err_msg("pthread create error!");
+            return (1);
+        }
+        if (pthread_mutex_init(&arg.fork[idx], NULL) != 0)
+        {
+            arg_free(&arg);
+            err_msg("pthread mutex init error!");
+            return (1);
+        }
+    }
+    if (pthread_create(&arg.print_thrd, NULL, print_thread_func, &arg) != 0)
+    {
+        arg_free(&arg);
+        err_msg("pthread create error!");
+        return (1);
+    }
+    if (pthread_create(&arg.time_thrd, NULL, time_thread_func, &arg) != 0)
+    {
+        arg_free(&arg);
+        err_msg("pthread create error!");
+        return (1);
     }
     gettimeofday(&arg.start, T_NULL);
-    arg.s_flag = TRUE;
+    arg.start_flag = TRUE;
 
     idx = -1;
     while (++idx < arg.philo_num)
     {
-        if (pthread_join(arg.philo[idx], NULL) != 0)
+        if (pthread_join(arg.philo[idx].thrd, NULL) != 0)
         {
-            philo_free(&arg);
-            free(philo);
-            err_msg("pthread join error\n", 1);
-        }   
+            arg_free(&arg);
+            err_msg("pthread join error\n");
+            return (1);
+        }
+        if (pthread_mutex_destroy(&arg.fork[idx]) != 0)
+        {
+            arg_free(&arg);
+            err_msg("pthread mutex destroy error\n");
+            return (1);
+        }
     }
-    
-    pthread_mutex_destroy(&arg.mutex);
-    free(philo);
-    philo_free(&arg);
+    arg_free(&arg);
     return 0;
 }
-
-
-
-

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/09 16:46:04 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/13 18:06:01 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,38 @@
 # endif
 
 typedef int	t_bool;
+typedef	struct timeval t_timeval;
+
+typedef enum e_thread_status
+{
+	DEATH = 1,
+	ABORT = 2
+}	t_thread_status;
+
+typedef	enum e_philo_status
+{
+	GET_FORK,
+	EATING,
+	SLEEPING,
+	THINKING,
+	DIE
+}	t_philo_status;
+
+typedef struct s_log
+{
+	t_timeval	time;
+	int			who;
+	t_philo_status	status;
+}	t_log;
 
 typedef struct s_philo
 {
 	int				idx;
-	int				first_pick;
-    int				second_pick;
-	struct timeval	last_eat;
+	pthread_mutex_t	*first_fork;
+    pthread_mutex_t	*second_fork;
+	t_timeval	last_eat;
+	pthread_t		thrd;
+	t_dll			logs;
 	t_arg			*arg;
 }	t_philo;
 
@@ -47,21 +72,23 @@ typedef struct s_arg
 	int	d_time;
 	int	e_time;
 	int	s_time;
-	int	eat_cnt;
-	pthread_t		*philo;
+	int	have_to_eat;
+	t_philo			*philo;
 	pthread_mutex_t	*fork;
-	struct timeval	start;
-	struct timeval	now;
-	t_bool	s_flag;
-	int	d_flag;
+	pthread_t	print_thrd;
+	pthread_t	time_thrd;
+	t_timeval	start;
+	t_timeval	now;
+	t_bool	start_flag;
+	int	da_flag;
 }	t_arg;
 
 void	err_init(char *argv);
-void	err_msg(const char *msg, int exit_code);
+void	err_msg(const char *msg);
 void	arg_free(t_arg *data);
 void* thread_function(void* arg);
 
-void	arg_init(t_arg *data, int argc, char **argv);
+int	arg_init(t_arg *data, int argc, char **argv);
 int		ft_atoi_int(const char *str);
 t_bool	ft_isdecimal(char *str);
 char	*ft_itoa(int n);
