@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/13 18:06:01 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/14 15:01:38 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 # include <sys/time.h>
 # include <limits.h>
 # include "double_linked_list.h"
+# include "ft_errno.h"
+# include "quick_sort.h"
 
 # if !defined(TRUE) && !defined(FALSE)
 #  define TRUE 1
@@ -80,17 +82,24 @@ typedef struct s_arg
 	t_timeval	start;
 	t_timeval	now;
 	t_bool	start_flag;
-	int	da_flag;
+	int		da_flag;
+	int		end_flag;
+	int		errno;
 }	t_arg;
 
 void	err_init(char *argv);
-void	err_msg(const char *msg);
+int		err_msg(const char *msg, int return_code);
 void	arg_free(t_arg *data);
-void* thread_function(void* arg);
+
+void	*philo_thread_func(void* arg);
+void	*print_thread_func(void* arg);
+void	*time_thread_func(void* arg);
+void	*exit_thread(t_arg *arg, t_thread_status status);
 
 int	arg_init(t_arg *data, int argc, char **argv);
 int		ft_atoi_int(const char *str);
 t_bool	ft_isdecimal(char *str);
 char	*ft_itoa(int n);
 void	*ft_calloc(size_t count, size_t size);
+
 # endif

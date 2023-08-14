@@ -1,32 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   quick_sort.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/30 22:06:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/14 11:17:58 by hyungdki         ###   ########.fr       */
+/*   Created: 2023/08/14 15:01:01 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/08/14 15:50:28 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#ifndef QUICK_SORT_H
+# define QUICK_SORT_H
 
-static const char	*g_program_name;
-
-void	err_init(char *argv)
+typedef struct s_data
 {
-	g_program_name = argv;
-}
+	void	*part;
+	int		left;
+	int		right;
+	int		(*compare_func)(void *, int, int);
+	void	(*swap_func)(void *, int, int);
+}	t_data;
 
-int	err_msg(const char *msg, int return_code)
-{
-	printf("%s: %s\n", g_program_name, msg);
-	return (return_code);
-}
-
-void	arg_free(t_arg *arg)
-{
-	free(arg->philo);
-	free(arg->fork);
-}
+void	sorting(void *lst, int size,
+			int (*compare_func)(void *, int, int),
+			void (*swap_func)(void *, int, int));
+#endif
