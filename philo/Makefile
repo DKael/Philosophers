@@ -6,12 +6,20 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/07/30 23:13:33 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/08/14 18:54:20 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS =	main.c \
+		double_linked_list1.c \
+		double_linked_list2.c \
+		double_linked_list3.c \
 		error.c \
+		init.c \
+		philo_thread_func.c \
+		print_thread_func.c \
+		quick_sort.c \
+		time_thread_func.c\
 		util.c \
 		
 OBJS = 	${SRCS:.c=.o}

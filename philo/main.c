@@ -6,34 +6,11 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/14 15:00:03 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/14 17:01:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-void    *print_thread_func(void *arg)
-{
-    
-}
-
-void    *time_thread_func(void *arg)
-{
-
-}
-
-void    *exit_thread(t_arg *arg, t_thread_status status)
-{
-    if (arg->da_flag == 0)
-    {
-        if (status == DEATH)
-            arg->da_flag |= DEATH;
-        else if (status == ABORT)
-            arg->da_flag |= ABORT;
-    }
-    arg->end_flag++;
-    return (T_NULL);
-}
 
 t_bool report(t_philo *value, t_philo_status status)
 {
@@ -58,61 +35,6 @@ t_bool report(t_philo *value, t_philo_status status)
     }
     dll_add_tail(&value->logs, log_node);
     return (TRUE);
-}
-
-void *philo_thread_func(void *param)
-{
-    t_philo *value;
-    t_arg *arg;
-    t_log *log;
-    int eat_cnt;
-    int cnt;
-
-    value = (t_philo *)param;
-    arg = (t_arg *)value->arg;
-    eat_cnt = 0;
-    while (arg->start_flag == FALSE)
-    {
-        if (usleep(10) != 0)
-            printf("usleep function is interrupted by a signal\n");
-        if (arg->da_flag != 0)
-            return (T_NULL);
-    }
-    while (1)
-    {
-        if (arg->da_flag != 0 || pthread_mutex_lock(value->first_fork) != 0)
-            return (exit_thread(arg, ABORT));
-        if (arg->da_flag != 0 || pthread_mutex_lock(value->second_fork) != 0)
-            return (exit_thread(arg, ABORT));
-        if (arg->da_flag != 0 || report(value, GET_FORK) == FALSE)
-            return (exit_thread(arg, ABORT));
-        if (arg->da_flag != 0 || report(value, EATING) == FALSE)
-            return (exit_thread(arg, ABORT));
-        cnt = -1;
-        while (++cnt < arg->e_time)
-            if (arg->da_flag != 0 || usleep(1000) != 0)
-                return (exit_thread(arg, ABORT));
-        if (arg->da_flag != 0 || pthread_mutex_unlock(value->first_fork) != 0)
-            return (exit_thread(arg, ABORT));
-        if (arg->da_flag != 0 || pthread_mutex_unlock(value->second_fork) != 0)
-            return (exit_thread(arg, ABORT));
-        if (arg->da_flag != 0 || gettimeofday(&value->last_eat, T_NULL) != 0)
-            return (exit_thread(arg, ABORT));
-        if (arg->have_to_eat != -1 && ++eat_cnt == arg->have_to_eat)
-        {
-            arg->end_flag++;
-            return (T_NULL);
-        }
-        if (arg->da_flag != 0 || report(value, SLEEPING) == FALSE)
-            return (exit_thread(arg, ABORT));
-        cnt = -1;
-        while (++cnt < arg->s_time)
-            if (arg->da_flag != 0 || usleep(1000) != 0)
-                return (exit_thread(arg, ABORT));
-        if (arg->da_flag != 0 || report(value, THINKING) == FALSE)
-            return (exit_thread(arg, ABORT));
-    }
-    return (T_NULL);
 }
 
 int main(int argc, char **argv)
@@ -218,6 +140,7 @@ int main(int argc, char **argv)
                 if (pthread_mutex_destroy(&arg.fork[arg.end_flag]) == EINVAL)
                     printf("The value specified by mutex is invalid.\n");
             arg.da_flag |= ABORT;
+            arg.end_flag = 0;
             while (++arg.end_flag < arg.philo_num + 2)
                 ;
             arg_free(&arg);
@@ -232,7 +155,7 @@ int main(int argc, char **argv)
             if (pthread_mutex_destroy(&arg.fork[arg.end_flag]) == EINVAL)
                 printf("The value specified by mutex is invalid.\n");
         arg.da_flag |= ABORT;
-        pthread_join(arg.time_thrd, NULL);
+        arg.end_flag = 0;
         while (++arg.end_flag < arg.philo_num + 2)
             ;
         arg_free(&arg);

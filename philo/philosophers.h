@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/14 15:01:38 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/14 18:58:09 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,41 +33,8 @@
 # endif
 
 typedef int	t_bool;
+
 typedef	struct timeval t_timeval;
-
-typedef enum e_thread_status
-{
-	DEATH = 1,
-	ABORT = 2
-}	t_thread_status;
-
-typedef	enum e_philo_status
-{
-	GET_FORK,
-	EATING,
-	SLEEPING,
-	THINKING,
-	DIE
-}	t_philo_status;
-
-typedef struct s_log
-{
-	t_timeval	time;
-	int			who;
-	t_philo_status	status;
-}	t_log;
-
-typedef struct s_philo
-{
-	int				idx;
-	pthread_mutex_t	*first_fork;
-    pthread_mutex_t	*second_fork;
-	t_timeval	last_eat;
-	pthread_t		thrd;
-	t_dll			logs;
-	t_arg			*arg;
-}	t_philo;
-
 typedef struct s_arg
 {
 	int	philo_num;
@@ -75,7 +42,7 @@ typedef struct s_arg
 	int	e_time;
 	int	s_time;
 	int	have_to_eat;
-	t_philo			*philo;
+	struct s_philo			*philo;
 	pthread_mutex_t	*fork;
 	pthread_t	print_thrd;
 	pthread_t	time_thrd;
@@ -87,14 +54,58 @@ typedef struct s_arg
 	int		errno;
 }	t_arg;
 
+typedef struct s_philo
+{
+	int				idx;
+	pthread_mutex_t	*first_fork;
+    pthread_mutex_t	*second_fork;
+	t_timeval		last_eat;
+	pthread_t		thrd;
+	t_dll			logs;
+	t_arg			*arg;
+	int				eat_cnt;
+}	t_philo;
+
+typedef	enum e_philo_status
+{
+	GET_FORK,
+	EATING,
+	SLEEPING,
+	THINKING,
+	DIE
+}	t_philo_status;
+
+typedef enum e_thread_status
+{
+	DEATH = 1,
+	ABORT = 2
+}	t_thread_status;
+
+typedef struct s_log
+{
+	t_timeval		time;
+	int				who;
+	t_philo_status	status;
+}	t_log;
+
+typedef struct s_srt
+{
+	int	time;
+	t_dllnode *ptr;
+}	t_srt;
+
+
+
 void	err_init(char *argv);
 int		err_msg(const char *msg, int return_code);
 void	arg_free(t_arg *data);
+void	*exit_thread(t_arg *arg, t_thread_status status, t_dll *dll);
+void	log_delete_func(void *content);
 
 void	*philo_thread_func(void* arg);
 void	*print_thread_func(void* arg);
 void	*time_thread_func(void* arg);
-void	*exit_thread(t_arg *arg, t_thread_status status);
+t_bool	report(t_philo *value, t_philo_status status);
 
 int	arg_init(t_arg *data, int argc, char **argv);
 int		ft_atoi_int(const char *str);

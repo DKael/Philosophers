@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 13:38:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/14 13:42:10 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/14 18:55:33 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@
 #define EPROTONOSUPPORT 43              /* Protocol not supported */
 #define ESOCKTNOSUPPORT 44              /* Socket type not supported */
 #define ENOTSUP         45              /* Operation not supported */
-#define EOPNOTSUPP       ENOTSUP        /* Operation not supported on socket */
 #define EPFNOSUPPORT    46              /* Protocol family not supported */
 #define EAFNOSUPPORT    47              /* Address family not supported by protocol family */
 #define EADDRINUSE      48              /* Address already in use */
@@ -109,7 +108,7 @@
 #define ERPCMISMATCH    73              /* RPC version wrong */
 #define EPROGUNAVAIL    74              /* RPC prog. not avail */
 #define EPROGMISMATCH   75              /* Program version wrong */
-#define EPROCUNAVAIL    76              /* Bad procedure for program *
+#define EPROCUNAVAIL    76              /* Bad procedure for program */
 #define ENOLCK          77              /* No locks available */
 #define ENOSYS          78              /* Function not implemented */
 #define EFTYPE          79              /* Inappropriate file type or format */
@@ -117,15 +116,15 @@
 #define ENEEDAUTH       81              /* Need authenticator */
 
 /* Intelligent device errors */
-#define EPWROFF         82      /* Device power is off */
-#define EDEVERR         83      /* Device error, e.g. paper out */
+#define EPWROFF         82              /* Device power is off */
+#define EDEVERR         83              /* Device error, e.g. paper out */
 #define EOVERFLOW       84              /* Value too large to be stored in data type */
 
 /* Program loading errors */
-#define EBADEXEC        85      /* Bad executable */
-#define EBADARCH        86      /* Bad CPU type in executable */
-#define ESHLIBVERS      87      /* Shared library version mismatch */
-#define EBADMACHO       88      /* Malformed Macho file */
+#define EBADEXEC        85              /* Bad executable */
+#define EBADARCH        86              /* Bad CPU type in executable */
+#define ESHLIBVERS      87              /* Shared library version mismatch */
+#define EBADMACHO       88              /* Malformed Macho file */
 #define ECANCELED       89              /* Operation canceled */
 #define EIDRM           90              /* Identifier removed */
 #define ENOMSG          91              /* No message of desired type */
