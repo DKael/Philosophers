@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/14 18:58:21 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/15 17:55:47 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ void *print_thread_func(void *input_arg)
 			else if (temp_log->status == THINKING)
 				printf("%d %d is thinking\n", temp_time, temp_log->who);
 		}
+		dll_clear(&total_logs, log_delete_func);
 		free(srt);
     }
     return (T_NULL);
