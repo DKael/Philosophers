@@ -6,36 +6,11 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/15 17:54:18 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/15 22:26:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-t_bool report(t_philo *value, t_philo_status status)
-{
-    t_log *log;
-    t_dllnode *log_node;
-
-    log = (t_log *)malloc(sizeof(t_log));
-    if (log == T_NULL)
-        return (FALSE);
-    if (gettimeofday(&log->time, T_NULL) != 0)
-    {
-        free(log);
-        return (FALSE);
-    }
-    log->who = value->idx + 1;
-    log->status = status;
-    log_node = dll_new_node(log);
-    if (log_node == T_NULL)
-    {
-        free(log);
-        return (FALSE);
-    }
-    dll_add_tail(&value->logs, log_node);
-    return (TRUE);
-}
 
 int main(int argc, char **argv)
 {
@@ -163,7 +138,7 @@ time_to_die time_to_eat time_to_sleep \
     }
     arg.start_flag = TRUE;
 
-    while (++arg.end_flag <= arg.philo_num + 2)
+    while (arg.end_flag < arg.philo_num)
     {
         if (usleep(1000) == -1)
             printf("usleep function is interrupted by a signal\n");
