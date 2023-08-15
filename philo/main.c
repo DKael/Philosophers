@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/14 17:01:13 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/15 17:54:18 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ int main(int argc, char **argv)
     if (argc != 5 && argc != 6)
     {
         printf("Usage : %s number_of_philosophers \
-        time_to_die time_to_eat time_to_sleep \
-        [number_of_times_each_philosopher_must_eat]\n",
+time_to_die time_to_eat time_to_sleep \
+[number_of_times_each_philosopher_must_eat]\n",
                argv[0]);
         return (1);
     }
@@ -68,11 +68,11 @@ int main(int argc, char **argv)
         if (idx % 2 == 0)
         {
             arg.philo[idx].first_fork = &arg.fork[idx];
-            arg.philo[idx].second_fork = &arg.fork[idx + 1 % arg.philo_num];
+            arg.philo[idx].second_fork = &arg.fork[(idx + 1) % arg.philo_num];
         }
         else
         {
-            arg.philo[idx].first_fork = &arg.fork[idx + 1 % arg.philo_num];
+            arg.philo[idx].first_fork = &arg.fork[(idx + 1) % arg.philo_num];
             arg.philo[idx].second_fork = &arg.fork[idx];
         }
         dll_init(&arg.philo[idx].logs);
