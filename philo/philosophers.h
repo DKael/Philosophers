@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/15 23:24:33 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/17 09:35:49 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@
 #ifndef T_NULL
 #define T_NULL (void *)0
 #endif
+
+# define S_TO_US 1000000
 
 typedef int t_bool;
 
@@ -61,7 +63,7 @@ typedef struct s_philo
 	int idx;
 	pthread_mutex_t *first_fork;
 	pthread_mutex_t *second_fork;
-	t_timeval last_eat;
+	long last_eat;
 	pthread_t thrd;
 	t_dll logs;
 	t_arg *arg;
@@ -70,17 +72,18 @@ typedef struct s_philo
 
 typedef enum e_philo_status
 {
+	THINKING,
 	GET_FORK,
 	EATING,
 	SLEEPING,
-	THINKING,
 	DIE
 } t_philo_status;
 
 typedef enum e_thread_status
 {
 	DEATH = 1,
-	ABORT = 2
+	ABORT = 2,
+	END = 3
 } t_thread_status;
 
 typedef struct s_log
@@ -94,6 +97,7 @@ typedef struct s_log
 typedef struct s_srt
 {
 	long usec;
+	int	status;
 	t_dllnode *ptr;
 } t_srt;
 
@@ -106,7 +110,7 @@ void log_delete_func(void *content);
 void *philo_thread_func(void *arg);
 void *print_thread_func(void *arg);
 void *time_thread_func(void *arg);
-t_bool report(t_philo *value, t_philo_status status, t_timeval start);
+t_bool report(t_philo *value, t_philo_status status, t_arg *arg);
 
 int arg_init(t_arg *data, int argc, char **argv);
 int ft_atoi_int(const char *str);

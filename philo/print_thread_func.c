@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/16 00:44:52 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/16 20:53:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,15 @@ int	srt_time_compare(void *input_lst, int idx1, int idx2)
 	else if (lst[idx1].usec < lst[idx2].usec)
 		return (-1);
 	else
-		return (0);
+	{
+		if (lst[idx1].status > lst[idx2].status)
+			return (1);
+		else if (lst[idx1].status < lst[idx2].status)
+			return (-1);
+		else
+			return (0);
+	}
+		
 }
 
 void	srt_swap(void *input_lst, int idx1, int idx2)
@@ -59,7 +67,7 @@ void *print_thread_func(void *input_arg)
 		time_offset = arg->philo_num * 10;
     while (arg->start_flag == FALSE)
     {
-        if (usleep(10) != 0)
+        if (usleep(1000) != 0)
             printf("usleep function is interrupted by a signal\n");
     }
     while (arg->end_flag < arg->philo_num && arg->da_flag == 0)
@@ -72,7 +80,7 @@ void *print_thread_func(void *input_arg)
 		while (++idx < arg->philo_num)
 		{
 			temp_dll = &(arg->philo[idx].logs.head);
-			while (arg->philo[idx].logs.size != 0
+			while (temp_dll->back != &(arg->philo[idx].logs.tail)
 				&& ((t_log *)temp_dll->back->contents)->usec < time_lapse_usec - time_offset)
 			{
 				temp_node = temp_dll->back;
@@ -93,6 +101,7 @@ void *print_thread_func(void *input_arg)
 		while (++idx < total_logs.size)
 		{
 			srt[idx].usec = ((t_log *)(temp_dll->contents))->usec;
+			srt[idx].status = ((t_log *)(temp_dll->contents))->status;
 			srt[idx].ptr = temp_dll;
 			temp_dll = temp_dll->back;
 		}
@@ -102,13 +111,13 @@ void *print_thread_func(void *input_arg)
 		{
 			temp_log = (t_log *)(srt[idx].ptr->contents);
 			if (temp_log->status == GET_FORK)
-				printf("%ld %d has taken a fork\n", temp_log->usec / 1000, temp_log->who);
+				printf("%ld %d has taken a fork\n", temp_log->usec, temp_log->who);
 			else if (temp_log->status == EATING)
-				printf("%ld %d is eating\n", temp_log->usec / 1000, temp_log->who);
+				printf("%ld %d is eating\n", temp_log->usec, temp_log->who);
 			else if (temp_log->status == SLEEPING)
-				printf("%ld %d is sleeping\n", temp_log->usec / 1000, temp_log->who);
+				printf("%ld %d is sleeping\n", temp_log->usec, temp_log->who);
 			else if (temp_log->status == THINKING)
-				printf("%ld %d is thinking\n", temp_log->usec / 1000, temp_log->who);
+				printf("%ld %d is thinking\n", temp_log->usec, temp_log->who);
 		}
 		dll_clear(&total_logs, log_delete_func);
 		free(srt);
