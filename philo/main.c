@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/19 17:43:21 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 21:09:49 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ time_to_die time_to_eat time_to_sleep \
     }
     if (pthread_mutex_lock(&arg.start_flag) != 0)
     {
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (1);
     }
@@ -107,6 +108,7 @@ time_to_die time_to_eat time_to_sleep \
             arg.da_flag |= ABORT;
             while (arg.end_flag < idx)
                 ;
+            mutex_destroy(&arg.start_flag);
             arg_free(&arg);
             return (err_msg("pthread create error!", 1));
         }
@@ -116,6 +118,7 @@ time_to_die time_to_eat time_to_sleep \
             pthread_join(arg.philo[idx].thrd, NULL);
             while (arg.end_flag <= idx)
                 ;
+            mutex_destroy(&arg.start_flag);
             arg_free(&arg);
             return (err_msg("pthread detach error!", 1));
         }
@@ -125,6 +128,7 @@ time_to_die time_to_eat time_to_sleep \
         arg.da_flag |= ABORT;
         while (arg.end_flag < arg.philo_num)
             ;
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (err_msg("pthread create error!", 1));
     }
@@ -134,6 +138,7 @@ time_to_die time_to_eat time_to_sleep \
         pthread_join(arg.print_thrd, NULL);
         while (arg.end_flag < arg.philo_num + 1)
             ;
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (err_msg("pthread detach error!", 1));
     }
@@ -142,6 +147,7 @@ time_to_die time_to_eat time_to_sleep \
         arg.da_flag |= ABORT;
         while (arg.end_flag < arg.philo_num + 1)
             ;
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (err_msg("pthread create error!", 1));
     }
@@ -151,6 +157,7 @@ time_to_die time_to_eat time_to_sleep \
         pthread_join(arg.time_thrd, NULL);
         while (arg.end_flag < arg.philo_num + 2)
             ;
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (err_msg("pthread detach error!", 1));
     }
@@ -164,6 +171,7 @@ time_to_die time_to_eat time_to_sleep \
             while (arg.end_flag < arg.philo_num + 2)
                 ;
             mutexes_destroy(arg.philo, idx);
+            mutex_destroy(&arg.start_flag);
             arg_free(&arg);
             return (err_msg("pthread mutex init error!", 1));
         }
@@ -179,6 +187,7 @@ time_to_die time_to_eat time_to_sleep \
                 ;
             mutexes_destroy(arg.philo, arg.philo_num);
             mutexes_destroy(arg.last_eat_mtx, idx);
+            mutex_destroy(&arg.start_flag);
             arg_free(&arg);
             return (err_msg("pthread mutex init error!", 1));
         }
@@ -195,6 +204,7 @@ time_to_die time_to_eat time_to_sleep \
             mutexes_destroy(arg.philo, arg.philo_num);
             mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
             mutexes_destroy(arg.log_mtx, idx);
+            mutex_destroy(&arg.start_flag);
             arg_free(&arg);
             return (err_msg("pthread mutex init error!", 1));
         }
@@ -208,6 +218,7 @@ time_to_die time_to_eat time_to_sleep \
         mutexes_destroy(arg.philo, arg.philo_num);
         mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
         mutexes_destroy(arg.log_mtx, arg.philo_num);
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (err_msg("pthread mutex init error!", 1));
     }
@@ -221,6 +232,7 @@ time_to_die time_to_eat time_to_sleep \
         mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
         mutexes_destroy(arg.log_mtx, arg.philo_num);
         mutex_destroy(&arg.end_flag_mtx);
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (err_msg("pthread mutex init error!", 1));
     }
@@ -235,6 +247,7 @@ time_to_die time_to_eat time_to_sleep \
         mutexes_destroy(arg.log_mtx, arg.philo_num);
         mutex_destroy(&arg.end_flag_mtx);
         mutex_destroy(&arg.da_flag_mtx);
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (err_msg("gettimeofday error!", 1));
     }
@@ -249,6 +262,7 @@ time_to_die time_to_eat time_to_sleep \
         mutexes_destroy(arg.log_mtx, arg.philo_num);
         mutex_destroy(&arg.end_flag_mtx);
         mutex_destroy(&arg.da_flag_mtx);
+        mutex_destroy(&arg.start_flag);
         arg_free(&arg);
         return (1);
     }

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/19 17:44:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 21:14:26 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,10 +55,21 @@ t_bool report(t_philo *value, t_philo_status status, t_arg *arg)
 		free(log);
 		return (FALSE);
 	}
-	log->usec = (log->time.tv_sec - arg->start.tv_sec) * S_TO_US
-		+ (log->time.tv_usec - arg->start.tv_usec);
+	log->usec = (log->time.tv_sec - arg->start.tv_sec) * S_TO_US + (log->time.tv_usec - arg->start.tv_usec);
 	if (status == EATING)
+	{
+		if (pthread_mutex_lock(&arg->last_eat_mtx[value->idx]) != 0)
+		{
+			free(log);
+			return (FALSE);
+		}
 		value->last_eat = log->usec;
+		if (pthread_mutex_unlock(&arg->last_eat_mtx[value->idx]) != 0)
+		{
+			free(log);
+			return (FALSE);
+		}
+	}
 	log->who = value->idx + 1;
 	log->status = status;
 	log_node = dll_new_node(log);
@@ -67,7 +78,19 @@ t_bool report(t_philo *value, t_philo_status status, t_arg *arg)
 		free(log);
 		return (FALSE);
 	}
+	if (pthread_mutex_lock(&arg->log_mtx[value->idx]) != 0)
+	{
+		free(log);
+		free(log_node);
+		return (FALSE);
+	}
 	dll_add_tail(&value->logs, log_node);
+	if (pthread_mutex_unlock(&arg->log_mtx[value->idx]) != 0)
+	{
+		free(log);
+		free(log_node);
+		return (FALSE);
+	}
 	return (TRUE);
 }
 
@@ -80,9 +103,9 @@ void *philo_thread_func(void *param)
 	arg = (t_arg *)value->arg;
 	value->eat_cnt = 0;
 	if (pthread_mutex_lock(&arg->start_flag) != 0)
-		return (T_NULL);
+		return (exit_thread(arg, ABORT, T_NULL));
 	if (pthread_mutex_unlock(&arg->start_flag) != 0)
-		return (T_NULL);
+		return (exit_thread(arg, ABORT, T_NULL));
 	if (value->idx % 2 == 0)
 		usleep(arg->philo_num);
 	return (philo_thread_func2(value, arg));

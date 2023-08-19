@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/19 20:10:29 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 21:17:45 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,9 @@ void *print_thread_func(void *input_arg)
 	else
 		time_offset = arg->philo_num * 10;
     if (pthread_mutex_lock(&arg->start_flag) != 0)
-		return (T_NULL);
+		return (exit_thread(arg, ABORT, T_NULL));
 	if (pthread_mutex_unlock(&arg->start_flag) != 0)
-		return (T_NULL);
+		return (exit_thread(arg, ABORT, T_NULL));
     while (arg->end_flag < arg->philo_num && arg->da_flag == 0)
     {
 		usleep(1000);
