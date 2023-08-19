@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   print_thread_func.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/16 20:53:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 20:10:29 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,10 @@ void *print_thread_func(void *input_arg)
 		time_offset = 5000;
 	else
 		time_offset = arg->philo_num * 10;
-    while (arg->start_flag == FALSE)
-    {
-        if (usleep(1000) != 0)
-            printf("usleep function is interrupted by a signal\n");
-    }
+    if (pthread_mutex_lock(&arg->start_flag) != 0)
+		return (T_NULL);
+	if (pthread_mutex_unlock(&arg->start_flag) != 0)
+		return (T_NULL);
     while (arg->end_flag < arg->philo_num && arg->da_flag == 0)
     {
 		usleep(1000);

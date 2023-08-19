@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_thread_func.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/16 21:00:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 17:44:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,10 @@ void *philo_thread_func(void *param)
 	value = (t_philo *)param;
 	arg = (t_arg *)value->arg;
 	value->eat_cnt = 0;
-	while (arg->start_flag == FALSE)
-	{
-		if (usleep(10) != 0)
-			printf("usleep function is interrupted by a signal\n");
-		if (arg->da_flag != 0)
-			return (T_NULL);
-	}
+	if (pthread_mutex_lock(&arg->start_flag) != 0)
+		return (T_NULL);
+	if (pthread_mutex_unlock(&arg->start_flag) != 0)
+		return (T_NULL);
 	if (value->idx % 2 == 0)
 		usleep(arg->philo_num);
 	return (philo_thread_func2(value, arg));

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 22:06:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/15 22:26:41 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 17:37:42 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ void	arg_free(t_arg *arg)
 {
 	free(arg->philo);
 	free(arg->fork);
+	free(arg->last_eat_mtx);
+	free(arg->log_mtx);
 }
 
 void *exit_thread(t_arg *arg, t_thread_status status, t_dll *dll)

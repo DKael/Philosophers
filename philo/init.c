@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/15 22:26:43 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 17:37:11 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,11 @@ static int arg_init2(t_arg *arg, int argc, char **argv)
 		if (arg->have_to_eat == 0 && argv[1][0] == '0')
 			return (err_msg("Invalid input! Wrong range of input value.\n", 1));
 	}
-	arg->start_flag = FALSE;
 	arg->da_flag = 0;
 	arg->end_flag = 0;
 	arg->philo = T_NULL;
 	arg->fork = T_NULL;
+	arg->last_eat_mtx = T_NULL;
 	arg->errno = 0;
 	return (0);
 }

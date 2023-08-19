@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/17 09:35:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 17:36:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,17 @@ typedef struct s_arg
 	int have_to_eat;
 	struct s_philo *philo;
 	pthread_mutex_t *fork;
+	pthread_mutex_t	*last_eat_mtx;
+	pthread_mutex_t	*log_mtx;
+	pthread_mutex_t	start_flag;
+	pthread_mutex_t	end_flag_mtx;
+	pthread_mutex_t	da_flag_mtx;
 	pthread_t print_thrd;
 	pthread_t time_thrd;
 	t_timeval start;
 	long start_usec;
 	t_timeval now;
 	long now_usec;
-	t_bool start_flag;
 	int da_flag;
 	int end_flag;
 	int errno;

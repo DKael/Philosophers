@@ -3,14 +3,47 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/15 22:26:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/19 17:43:21 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+void mutexes_destroy(pthread_mutex_t *lst, int num)
+{
+    int idx;
+    int result;
+
+    idx = -1;
+    while (++idx < num)
+    {
+        result = pthread_mutex_destroy(&lst[idx]);
+        if (result == EINVAL)
+            printf("The value specified by mutex is invalid.\n");
+        else if (result == EBUSY)
+        {
+            pthread_mutex_unlock(&lst[idx]);
+            pthread_mutex_destroy(&lst[idx]);
+        }
+    }
+}
+
+void mutex_destroy(pthread_mutex_t *mtx)
+{
+    int result;
+    
+    result = pthread_mutex_destroy(mtx);
+    if (result == EINVAL)
+        printf("The value specified by mutex is invalid.\n");
+    else if (result == EBUSY)
+    {
+        pthread_mutex_unlock(mtx);
+        pthread_mutex_destroy(mtx);
+    }
+}
 
 int main(int argc, char **argv)
 {
@@ -33,6 +66,23 @@ time_to_die time_to_eat time_to_sleep \
     arg.fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * arg.philo_num);
     if (arg.fork == T_NULL)
         return (err_msg("malloc error!", 1));
+    arg.last_eat_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * arg.philo_num);
+    if (arg.fork == T_NULL)
+        return (err_msg("malloc error!", 1));
+    arg.log_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * arg.philo_num);
+    if (arg.fork == T_NULL)
+        return (err_msg("malloc error!", 1));
+
+    if (pthread_mutex_init(&arg.da_flag_mtx, NULL) != 0)
+    {
+        arg_free(&arg);
+        return (1);
+    }
+    if (pthread_mutex_lock(&arg.start_flag) != 0)
+    {
+        arg_free(&arg);
+        return (1);
+    }
 
     int idx;
 
@@ -55,7 +105,7 @@ time_to_die time_to_eat time_to_sleep \
         if (pthread_create(&arg.philo[idx].thrd, NULL, philo_thread_func, &arg.philo[idx]) != 0)
         {
             arg.da_flag |= ABORT;
-            while (++arg.end_flag < idx)
+            while (arg.end_flag < idx)
                 ;
             arg_free(&arg);
             return (err_msg("pthread create error!", 1));
@@ -64,7 +114,7 @@ time_to_die time_to_eat time_to_sleep \
         {
             arg.da_flag |= ABORT;
             pthread_join(arg.philo[idx].thrd, NULL);
-            while (++arg.end_flag <= idx)
+            while (arg.end_flag <= idx)
                 ;
             arg_free(&arg);
             return (err_msg("pthread detach error!", 1));
@@ -73,7 +123,7 @@ time_to_die time_to_eat time_to_sleep \
     if (pthread_create(&arg.print_thrd, NULL, print_thread_func, &arg) != 0)
     {
         arg.da_flag |= ABORT;
-        while (++arg.end_flag < arg.philo_num)
+        while (arg.end_flag < arg.philo_num)
             ;
         arg_free(&arg);
         return (err_msg("pthread create error!", 1));
@@ -82,7 +132,7 @@ time_to_die time_to_eat time_to_sleep \
     {
         arg.da_flag |= ABORT;
         pthread_join(arg.print_thrd, NULL);
-        while (++arg.end_flag <= arg.philo_num)
+        while (arg.end_flag < arg.philo_num + 1)
             ;
         arg_free(&arg);
         return (err_msg("pthread detach error!", 1));
@@ -90,7 +140,7 @@ time_to_die time_to_eat time_to_sleep \
     if (pthread_create(&arg.time_thrd, NULL, time_thread_func, &arg) != 0)
     {
         arg.da_flag |= ABORT;
-        while (++arg.end_flag < arg.philo_num + 1)
+        while (arg.end_flag < arg.philo_num + 1)
             ;
         arg_free(&arg);
         return (err_msg("pthread create error!", 1));
@@ -99,7 +149,7 @@ time_to_die time_to_eat time_to_sleep \
     {
         arg.da_flag |= ABORT;
         pthread_join(arg.time_thrd, NULL);
-        while (++arg.end_flag <= arg.philo_num + 1)
+        while (arg.end_flag < arg.philo_num + 2)
             ;
         arg_free(&arg);
         return (err_msg("pthread detach error!", 1));
@@ -110,52 +160,111 @@ time_to_die time_to_eat time_to_sleep \
     {
         if (pthread_mutex_init(&arg.fork[idx], NULL) != 0)
         {
-            arg.end_flag = -1;
-            while (++arg.end_flag < idx)
-                if (pthread_mutex_destroy(&arg.fork[arg.end_flag]) == EINVAL)
-                    printf("The value specified by mutex is invalid.\n");
             arg.da_flag |= ABORT;
-            arg.end_flag = 0;
-            while (++arg.end_flag < arg.philo_num + 2)
+            while (arg.end_flag < arg.philo_num + 2)
                 ;
+            mutexes_destroy(arg.philo, idx);
             arg_free(&arg);
             return (err_msg("pthread mutex init error!", 1));
         }
     }
 
-    if (gettimeofday(&arg.start, T_NULL) != 0)
+    idx = -1;
+    while (++idx < arg.philo_num)
     {
-        arg.end_flag = -1;
-        while (++arg.end_flag < arg.philo_num)
-            if (pthread_mutex_destroy(&arg.fork[arg.end_flag]) == EINVAL)
-                printf("The value specified by mutex is invalid.\n");
-        arg.da_flag |= ABORT;
-        arg.end_flag = 0;
-        while (++arg.end_flag < arg.philo_num + 2)
-            ;
-        arg_free(&arg);
-        return (err_msg("gettimeofday error!", 1));
-    }
-    arg.start_flag = TRUE;
-
-    while (arg.end_flag < arg.philo_num)
-    {
-        if (usleep(1000) == -1)
-            printf("usleep function is interrupted by a signal\n");
+        if (pthread_mutex_init(&arg.last_eat_mtx[idx], NULL) != 0)
+        {
+            arg.da_flag |= ABORT;
+            while (arg.end_flag < arg.philo_num + 2)
+                ;
+            mutexes_destroy(arg.philo, arg.philo_num);
+            mutexes_destroy(arg.last_eat_mtx, idx);
+            arg_free(&arg);
+            return (err_msg("pthread mutex init error!", 1));
+        }
     }
 
     idx = -1;
     while (++idx < arg.philo_num)
     {
-        arg.errno = pthread_mutex_destroy(&arg.fork[idx]);
-        if (arg.errno == EBUSY)
+        if (pthread_mutex_init(&arg.log_mtx[idx], NULL) != 0)
         {
-            pthread_mutex_unlock(&arg.fork[arg.end_flag]);
-            pthread_mutex_destroy(&arg.fork[arg.end_flag]);
+            arg.da_flag |= ABORT;
+            while (arg.end_flag < arg.philo_num + 2)
+                ;
+            mutexes_destroy(arg.philo, arg.philo_num);
+            mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
+            mutexes_destroy(arg.log_mtx, idx);
+            arg_free(&arg);
+            return (err_msg("pthread mutex init error!", 1));
         }
-        else if (arg.errno == EINVAL)
-            printf("The value specified by mutex is invalid.\n");
     }
+
+    if (pthread_mutex_init(&arg.end_flag_mtx, NULL) != 0)
+    {
+        arg.da_flag |= ABORT;
+        while (arg.end_flag < arg.philo_num + 2)
+            ;
+        mutexes_destroy(arg.philo, arg.philo_num);
+        mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
+        mutexes_destroy(arg.log_mtx, arg.philo_num);
+        arg_free(&arg);
+        return (err_msg("pthread mutex init error!", 1));
+    }
+
+    if (pthread_mutex_init(&arg.da_flag_mtx, NULL) != 0)
+    {
+        arg.da_flag |= ABORT;
+        while (arg.end_flag < arg.philo_num + 2)
+            ;
+        mutexes_destroy(arg.philo, arg.philo_num);
+        mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
+        mutexes_destroy(arg.log_mtx, arg.philo_num);
+        mutex_destroy(&arg.end_flag_mtx);
+        arg_free(&arg);
+        return (err_msg("pthread mutex init error!", 1));
+    }
+
+    if (gettimeofday(&arg.start, T_NULL) != 0)
+    {
+        arg.da_flag |= ABORT;
+        while (arg.end_flag < arg.philo_num + 2)
+            ;
+        mutexes_destroy(arg.philo, arg.philo_num);
+        mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
+        mutexes_destroy(arg.log_mtx, arg.philo_num);
+        mutex_destroy(&arg.end_flag_mtx);
+        mutex_destroy(&arg.da_flag_mtx);
+        arg_free(&arg);
+        return (err_msg("gettimeofday error!", 1));
+    }
+
+    if (pthread_mutex_unlock(&arg.start_flag) != 0)
+    {
+        arg.da_flag |= ABORT;
+        while (arg.end_flag < arg.philo_num + 2)
+            ;
+        mutexes_destroy(arg.philo, arg.philo_num);
+        mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
+        mutexes_destroy(arg.log_mtx, arg.philo_num);
+        mutex_destroy(&arg.end_flag_mtx);
+        mutex_destroy(&arg.da_flag_mtx);
+        arg_free(&arg);
+        return (1);
+    }
+
+    while (arg.end_flag < arg.philo_num + 2)
+    {
+        if (usleep(1000) == -1)
+            printf("usleep function is interrupted by a signal\n");
+    }
+
+    mutexes_destroy(arg.philo, arg.philo_num);
+    mutexes_destroy(arg.last_eat_mtx, arg.philo_num);
+    mutexes_destroy(arg.log_mtx, arg.philo_num);
+    mutex_destroy(&arg.start_flag);
+    mutex_destroy(&arg.end_flag_mtx);
+    mutex_destroy(&arg.da_flag_mtx);
     arg_free(&arg);
     return (0);
 }
