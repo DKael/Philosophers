@@ -3,25 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 22:06:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/19 17:37:42 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/20 19:54:42 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-static const char	*g_program_name;
-
-void	err_init(char *argv)
+int err_msg(t_arg *arg, const char *msg, int return_code)
 {
-	g_program_name = argv;
-}
-
-int	err_msg(const char *msg, int return_code)
-{
-	printf("%s: %s\n", g_program_name, msg);
+	if (msg != NULL)
+		printf("%s: %s\n", arg->program_name, msg);
+	else
+		printf("%s: undefined error\n", arg->program_name);
 	return (return_code);
 }
 
@@ -33,28 +29,30 @@ void	arg_free(t_arg *arg)
 	free(arg->log_mtx);
 }
 
-void *exit_thread(t_arg *arg, t_thread_status status, t_dll *dll)
-{	
-    if (arg->da_flag == 0)
-    {
-        if (status == DEATH)
-            arg->da_flag |= DEATH;
-        else if (status == ABORT)
-            arg->da_flag |= ABORT;
-    }
-	if (dll != T_NULL)
-		dll_clear(dll, log_delete_func);
-    arg->end_flag++;
-    return (T_NULL);
+void	philos_log_clear(t_arg *arg, int cnt)
+{
+	int idx;
+
+    idx = -1;
+    while (++idx < cnt)
+        dll_clear(&arg->philo[idx].logs, log_delete_func);
 }
 
-void	log_delete_func(void *content)
+void log_delete_func(void *content)
 {
-	t_log	*temp;
+	t_log *temp;
 
-	if (content != T_NULL)
+	if (content != NULL)
 	{
 		temp = (t_log *)content;
 		free(temp);
 	}
+}
+
+void	*thread_error_end(t_arg *arg)
+{
+	pthread_mutex_lock(&arg->end_flag_mtx);
+	arg->end_flag = TRUE;
+	pthread_mutex_unlock(&arg->end_flag_mtx);
+	return (NULL);
 }

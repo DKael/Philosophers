@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:16:13 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/09 16:30:11 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/20 19:09:45 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 #  define TRUE 1
 #  define FALSE 0
 # endif
-# ifndef T_NULL
-#  define T_NULL (void *)0
+# ifndef NULL
+#  define NULL (void *)0
 # endif
 
 typedef int	t_bool;

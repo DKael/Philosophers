@@ -141,3 +141,31 @@ void	*ft_calloc(size_t count, size_t size)
 	}
 	return (result);
 }
+
+t_bool ft_usleep(int ms)
+{
+	t_timeval start;
+	t_timeval t;
+	long us;
+	long convert_ms_to_us;
+	long sleep_time;
+
+	convert_ms_to_us = ms * MS_TO_US;
+	if (gettimeofday(&start, NULL) != 0 || gettimeofday(&t, NULL) != 0)
+		return (FALSE);
+	us = (t.tv_sec - start.tv_sec) * S_TO_US + (t.tv_usec - start.tv_usec);
+	sleep_time = convert_ms_to_us;
+	while (us < convert_ms_to_us)
+	{
+		if (sleep_time > 10)
+			sleep_time /= 5;
+		else
+			sleep_time = 1;
+		if (usleep(sleep_time) != 0)
+			printf("usleep function is interrupted by a signal\n");
+		if (gettimeofday(&t, NULL) != 0)
+			return (FALSE);
+		us = (t.tv_sec - start.tv_sec) * S_TO_US + (t.tv_usec - start.tv_usec);
+	}
+	return (TRUE);
+}

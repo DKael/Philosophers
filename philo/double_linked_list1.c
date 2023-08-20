@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:22 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/09 16:30:37 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/20 19:09:47 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 void	dll_init(t_dll *dll)
 {
-	dll->head.front = T_NULL;
+	dll->head.front = NULL;
 	dll->head.back = &(dll->tail);
 	dll->tail.front = &(dll->head);
-	dll->tail.back = T_NULL;
+	dll->tail.back = NULL;
 	dll->size = 0;
 }
 

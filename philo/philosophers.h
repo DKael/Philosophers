@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/19 17:36:59 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/20 19:53:09 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,12 @@
 #define TRUE 1
 #define FALSE 0
 #endif
-#ifndef T_NULL
-#define T_NULL (void *)0
+#ifndef NULL
+#define NULL (void *)0
 #endif
 
-# define S_TO_US 1000000
+#define S_TO_US 1000000
+#define MS_TO_US 1000
 
 typedef int t_bool;
 
@@ -44,22 +45,30 @@ typedef struct s_arg
 	int e_time;
 	int s_time;
 	int have_to_eat;
+
 	struct s_philo *philo;
+
 	pthread_mutex_t *fork;
-	pthread_mutex_t	*last_eat_mtx;
-	pthread_mutex_t	*log_mtx;
-	pthread_mutex_t	start_flag;
-	pthread_mutex_t	end_flag_mtx;
-	pthread_mutex_t	da_flag_mtx;
+	int fork_cnt;
+
+	pthread_mutex_t *last_eat_mtx;
+	int last_eat_mtx_cnt;
+
+	pthread_mutex_t *log_mtx;
+	int log_mtx_cnt;
+
+	pthread_mutex_t start_flag;
+	t_bool start_flag_chk;
+
+	pthread_mutex_t end_flag_mtx;
+	t_bool end_flag_mtx_chk;
+	t_bool end_flag;
+
 	pthread_t print_thrd;
 	pthread_t time_thrd;
 	t_timeval start;
-	long start_usec;
-	t_timeval now;
-	long now_usec;
-	int da_flag;
-	int end_flag;
-	int errno;
+
+	char *program_name;
 } t_arg;
 
 typedef struct s_philo
@@ -101,15 +110,17 @@ typedef struct s_log
 typedef struct s_srt
 {
 	long usec;
-	int	status;
+	int status;
 	t_dllnode *ptr;
 } t_srt;
 
-void err_init(char *argv);
-int err_msg(const char *msg, int return_code);
+int check_end_flag(t_arg *arg);
+
+int err_msg(t_arg *arg, const char *msg, int return_code);
 void arg_free(t_arg *data);
-void *exit_thread(t_arg *arg, t_thread_status status, t_dll *dll);
 void log_delete_func(void *content);
+void	*thread_error_end(t_arg *arg);
+void philos_log_clear(t_arg *arg, int cnt);
 
 void *philo_thread_func(void *arg);
 void *print_thread_func(void *arg);
@@ -121,5 +132,6 @@ int ft_atoi_int(const char *str);
 t_bool ft_isdecimal(char *str);
 char *ft_itoa(int n);
 void *ft_calloc(size_t count, size_t size);
+t_bool ft_usleep(int ms);
 
 #endif

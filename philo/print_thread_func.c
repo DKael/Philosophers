@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   print_thread_func.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/19 21:17:45 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/20 20:06:44 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-int	srt_time_compare(void *input_lst, int idx1, int idx2)
+int srt_time_compare(void *input_lst, int idx1, int idx2)
 {
-	t_srt	*lst;
+	t_srt *lst;
 
 	lst = (t_srt *)input_lst;
 	if (lst[idx1].usec > lst[idx2].usec)
@@ -30,13 +30,12 @@ int	srt_time_compare(void *input_lst, int idx1, int idx2)
 		else
 			return (0);
 	}
-		
 }
 
-void	srt_swap(void *input_lst, int idx1, int idx2)
+void srt_swap(void *input_lst, int idx1, int idx2)
 {
-	t_srt	*lst;
-	t_srt	temp;
+	t_srt *lst;
+	t_srt temp;
 
 	lst = (t_srt *)input_lst;
 	temp = lst[idx1];
@@ -46,55 +45,58 @@ void	srt_swap(void *input_lst, int idx1, int idx2)
 
 void *print_thread_func(void *input_arg)
 {
-    t_timeval	time_lapse;
-	long		time_lapse_usec;
-    t_dll		total_logs;
-	t_dllnode	*temp_node;
-	t_dllnode	*temp_dll;
-	t_log		*temp_log;
-    t_arg		*arg;
-	t_srt		*srt;
-	int			idx;
-	long		time_offset;
+	t_timeval time_lapse;
+	long time_lapse_usec;
+	t_dll total_logs;
+	t_dllnode *temp_node;
+	t_dllnode *temp_dll;
+	t_log *temp_log;
+	t_arg *arg;
+	t_srt *srt;
+	int idx;
+	long time_offset;
 
-    arg = (t_arg *)input_arg;
-    dll_init(&total_logs);
+	arg = (t_arg *)input_arg;
+	dll_init(&total_logs);
 	if (arg->philo_num < 100)
 		time_offset = 1000;
 	else if (arg->philo_num >= 500)
 		time_offset = 5000;
 	else
 		time_offset = arg->philo_num * 10;
-    if (pthread_mutex_lock(&arg->start_flag) != 0)
-		return (exit_thread(arg, ABORT, T_NULL));
-	if (pthread_mutex_unlock(&arg->start_flag) != 0)
-		return (exit_thread(arg, ABORT, T_NULL));
-    while (arg->end_flag < arg->philo_num && arg->da_flag == 0)
-    {
-		usleep(1000);
-        if (gettimeofday(&time_lapse, T_NULL) != 0)
-            return (exit_thread(arg, ABORT, T_NULL));
-		time_lapse_usec = (time_lapse.tv_sec - arg->start.tv_sec) * 1000000 + (time_lapse.tv_usec - arg->start.tv_usec);
-        idx = -1;
+	pthread_mutex_lock(&arg->start_flag);
+	pthread_mutex_unlock(&arg->start_flag);
+	while (1)
+	{
+		if (usleep(1000) == EINTR)
+			printf("Interrupted by a signa\n");
+		if (gettimeofday(&time_lapse, NULL) != 0)
+			return (thread_error_end(arg));
+		time_lapse_usec = (time_lapse.tv_sec - arg->start.tv_sec) * S_TO_US + (time_lapse.tv_usec - arg->start.tv_usec);
+		idx = -1;
 		while (++idx < arg->philo_num)
 		{
 			temp_dll = &(arg->philo[idx].logs.head);
-			while (temp_dll->back != &(arg->philo[idx].logs.tail)
-				&& ((t_log *)temp_dll->back->contents)->usec < time_lapse_usec - time_offset)
+			pthread_mutex_lock(&arg->log_mtx[idx]);
+			while (arg->philo[idx].logs.size != 0 && ((t_log *)temp_dll->back->contents)->usec < time_lapse_usec - time_offset)
 			{
 				temp_node = temp_dll->back;
 				temp_dll->back->back->front = temp_dll;
 				temp_dll->back = temp_dll->back->back;
 				arg->philo[idx].logs.size--;
 				dll_add_tail(&total_logs, temp_node);
-				temp_node = T_NULL;
+				temp_node = NULL;
 			}
+			pthread_mutex_unlock(&arg->log_mtx[idx]);
 		}
 		if (total_logs.size == 0)
 			continue;
 		srt = (t_srt *)malloc(sizeof(t_srt) * total_logs.size);
-		if (srt == T_NULL)
-			return (exit_thread(arg, ABORT, &total_logs));
+		if (srt == NULL)
+		{
+			dll_clear(&total_logs, log_delete_func);
+			return (thread_error_end(arg));
+		}
 		idx = -1;
 		temp_dll = total_logs.head.back;
 		while (++idx < total_logs.size)
@@ -117,9 +119,19 @@ void *print_thread_func(void *input_arg)
 				printf("%ld %d is sleeping\n", temp_log->usec, temp_log->who);
 			else if (temp_log->status == THINKING)
 				printf("%ld %d is thinking\n", temp_log->usec, temp_log->who);
+			else if (temp_log->status == DIE)
+			{
+				printf("%ld %d is died\n", temp_log->usec, temp_log->who);
+				dll_clear(&total_logs, log_delete_func);
+				free(srt);
+				pthread_mutex_lock(&arg->end_flag_mtx);
+				arg->end_flag = TRUE;
+				pthread_mutex_unlock(&arg->end_flag_mtx);
+				return (NULL);
+			}
 		}
 		dll_clear(&total_logs, log_delete_func);
 		free(srt);
-    }
-    return (T_NULL);
+	}
+	return (NULL);
 }
