@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 20:06:44 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/20 20:28:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void *print_thread_func(void *input_arg)
 		time_offset = arg->philo_num * 10;
 	pthread_mutex_lock(&arg->start_flag);
 	pthread_mutex_unlock(&arg->start_flag);
-	while (1)
+	while (check_end_flag(arg) == 0)
 	{
 		if (usleep(1000) == EINTR)
 			printf("Interrupted by a signa\n");
@@ -112,16 +112,16 @@ void *print_thread_func(void *input_arg)
 		{
 			temp_log = (t_log *)(srt[idx].ptr->contents);
 			if (temp_log->status == GET_FORK)
-				printf("%ld %d has taken a fork\n", temp_log->usec, temp_log->who);
+				printf("%ld %d has taken a fork\n", temp_log->usec / 1000, temp_log->who);
 			else if (temp_log->status == EATING)
-				printf("%ld %d is eating\n", temp_log->usec, temp_log->who);
+				printf("%ld %d is eating\n", temp_log->usec / 1000, temp_log->who);
 			else if (temp_log->status == SLEEPING)
-				printf("%ld %d is sleeping\n", temp_log->usec, temp_log->who);
+				printf("%ld %d is sleeping\n", temp_log->usec / 1000, temp_log->who);
 			else if (temp_log->status == THINKING)
-				printf("%ld %d is thinking\n", temp_log->usec, temp_log->who);
+				printf("%ld %d is thinking\n", temp_log->usec / 1000, temp_log->who);
 			else if (temp_log->status == DIE)
 			{
-				printf("%ld %d is died\n", temp_log->usec, temp_log->who);
+				printf("%ld %d is died\n", temp_log->usec / 1000, temp_log->who);
 				dll_clear(&total_logs, log_delete_func);
 				free(srt);
 				pthread_mutex_lock(&arg->end_flag_mtx);

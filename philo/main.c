@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 19:55:44 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/20 20:28:07 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,6 @@ time_to_die time_to_eat time_to_sleep \
         }
         pthread_join(arg.philo[idx].thrd, NULL);
     }
-
     arg_mutexes_destroy(&arg);
     arg_free(&arg);
 

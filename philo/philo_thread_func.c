@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 20:05:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/20 20:23:12 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ void *philo_thread_func(void *param)
 				printf("Interrupted by a signa\n");
 		return (NULL);
 	}
-	if (value->idx % 2 == 0)
-		usleep(arg->philo_num);
+	if (value->idx % 2 == 0 && usleep(1000) == EINTR)
+		printf("Interrupted by a signa\n");
 	return (philo_thread_func2(value, arg));
 }
 
