@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/08/20 19:46:47 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/08/21 13:27:39 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,13 +32,23 @@ CFLAGS = -Wall -Wextra -Werror
 
 NAME = philo
 
+DATA_RACE_CHECK = 0
+
+ifeq ($(DATA_RACE_CHECK),1)
 ${NAME} : ${TOTAL_OBJS}
-	${CC} ${CFLAGS} ${TOTAL_OBJS}  -o $@
+	${CC} ${CFLAGS} ${TOTAL_OBJS} -g -fsanitize=thread -o $@
+else
+${NAME} : ${TOTAL_OBJS}
+	${CC} ${CFLAGS} ${TOTAL_OBJS} -o $@
+endif
 
 %.o :%.c
 	${CC} ${CFLAGS} -c -I. $< -o $@
 
 all : ${NAME}
+
+data_race_check : 
+	@make DATA_RACE_CHECK=1
 
 clean:
 	rm -f ${OBJS}
@@ -51,4 +61,4 @@ re:
 	make fclean
 	make all
 
-.PHONY: all clean fclean re bonus
+.PHONY: all clean fclean re bonus data_race_check

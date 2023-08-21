@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 20:30:14 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 18:18:06 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,6 @@ void *print_thread_func(void *input_arg)
 				temp_dll->back = temp_dll->back->back;
 				arg->philo[idx].logs.size--;
 				dll_add_tail(&total_logs, temp_node);
-				temp_node = NULL;
 			}
 			pthread_mutex_unlock(&arg->log_mtx[idx]);
 		}
@@ -121,7 +120,7 @@ void *print_thread_func(void *input_arg)
 				printf("%ld %d is thinking\n", temp_log->usec / 1000, temp_log->who);
 			else if (temp_log->status == DIE)
 			{
-				printf("%ld %d is died\n", temp_log->usec / 1000, temp_log->who);
+				printf("%ld %d died\n", temp_log->usec / 1000, temp_log->who);
 				dll_clear(&total_logs, log_delete_func);
 				free(srt);
 				pthread_mutex_lock(&arg->end_flag_mtx);

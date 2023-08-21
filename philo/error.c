@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 22:06:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 19:54:42 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 16:45:57 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,13 @@ void	philos_log_clear(t_arg *arg, int cnt)
         dll_clear(&arg->philo[idx].logs, log_delete_func);
 }
 
-void log_delete_func(void *content)
+void log_delete_func(void *log)
 {
 	t_log *temp;
 
-	if (content != NULL)
+	if (log != NULL)
 	{
-		temp = (t_log *)content;
+		temp = (t_log *)log;
 		free(temp);
 	}
 }

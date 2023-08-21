@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 20:28:07 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 18:45:54 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,15 @@ void arg_pthreads_join(t_arg *arg, int cnt)
     idx = -1;
     while (++idx < cnt)
         pthread_join(arg->philo[idx].thrd, NULL);
+}
+
+int arg_mutexes_init(t_arg *arg, int *mtx_cnt)
+{
+    *mtx_cnt = -1;
+    while (++(*mtx_cnt) < arg->philo_num)
+        if (pthread_mutex_init(&arg->fork[*mtx_cnt], NULL) != 0)
+            return (1);
+    return (0);
 }
 
 void arg_mutexes_destroy(t_arg *arg)
@@ -68,6 +77,7 @@ int main_thread_end(t_arg *arg, int idx, const char *msg)
 
 int main(int argc, char **argv)
 {
+    
     t_arg arg;
 
     if (argc != 5 && argc != 6)
@@ -103,16 +113,8 @@ time_to_die time_to_eat time_to_sleep \
     while (++idx < arg.philo_num)
     {
         arg.philo[idx].idx = idx;
-        if (idx % 2 == 0)
-        {
-            arg.philo[idx].first_fork = &arg.fork[idx];
-            arg.philo[idx].second_fork = &arg.fork[(idx + 1) % arg.philo_num];
-        }
-        else
-        {
-            arg.philo[idx].first_fork = &arg.fork[(idx + 1) % arg.philo_num];
-            arg.philo[idx].second_fork = &arg.fork[idx];
-        }
+        arg.philo[idx].first_fork = &arg.fork[idx];
+        arg.philo[idx].second_fork = &arg.fork[(idx + 1) % arg.philo_num];
         dll_init(&arg.philo[idx].logs);
         arg.philo[idx].arg = &arg;
         if (pthread_create(&arg.philo[idx].thrd, NULL, philo_thread_func, &arg.philo[idx]) != 0)
@@ -123,39 +125,24 @@ time_to_die time_to_eat time_to_sleep \
     if (pthread_create(&arg.philo[arg.philo_num + 1].thrd, NULL, time_thread_func, &arg) != 0)
         return (main_thread_end(&arg, arg.philo_num + 1, "pthread create error!"));
 
-    arg.fork_cnt = -1;
-    while (++arg.fork_cnt < arg.philo_num)
-        if (pthread_mutex_init(&arg.fork[arg.fork_cnt], NULL) != 0)
-            return (main_thread_end(&arg, arg.philo_num + 2, "pthread mutex init error!"));
+    if (arg_mutexes_init(&arg, &arg.fork_cnt) != 0
+        || arg_mutexes_init(&arg, &arg.last_eat_mtx_cnt) != 0
+        || arg_mutexes_init(&arg, &arg.log_mtx_cnt) != 0
+        || gettimeofday(&arg.start, NULL) != 0)
+        return (main_thread_end(&arg, arg.philo_num + 2, "pthread mutex init error!"));
 
-    arg.last_eat_mtx_cnt = -1;
-    while (++arg.last_eat_mtx_cnt < arg.philo_num)
-        if (pthread_mutex_init(&arg.last_eat_mtx[arg.last_eat_mtx_cnt], NULL) != 0)
-            return (main_thread_end(&arg, arg.philo_num + 2, "pthread mutex init error!"));
-
-    arg.log_mtx_cnt = -1;
-    while (++arg.log_mtx_cnt < arg.philo_num)
-        if (pthread_mutex_init(&arg.log_mtx[arg.log_mtx_cnt], NULL) != 0)
-            return (main_thread_end(&arg, arg.philo_num + 2, "pthread mutex init error!"));
-
-    if (gettimeofday(&arg.start, NULL) != 0)
-        return (main_thread_end(&arg, arg.philo_num + 2, "gettimeofday error!"));
 
     pthread_mutex_unlock(&arg.start_flag);
 
     idx = -1;
-    while (++idx < arg.philo_num + 2)
-    {
-        if (idx == arg.philo_num)
-        {
-            pthread_mutex_lock(&arg.end_flag_mtx);
-            arg.end_flag = TRUE;
-            pthread_mutex_unlock(&arg.end_flag_mtx);
-        }
+    while (++idx < arg.philo_num)
         pthread_join(arg.philo[idx].thrd, NULL);
-    }
+    pthread_mutex_lock(&arg.end_flag_mtx);
+    arg.end_flag = TRUE;
+    pthread_mutex_unlock(&arg.end_flag_mtx);
+    pthread_join(arg.philo[idx].thrd, NULL);
+    pthread_join(arg.philo[idx + 1].thrd, NULL);
     arg_mutexes_destroy(&arg);
     arg_free(&arg);
-
     return (0);
 }

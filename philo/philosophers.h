@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 20:36:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 19:53:09 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 16:45:52 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,13 +92,6 @@ typedef enum e_philo_status
 	DIE
 } t_philo_status;
 
-typedef enum e_thread_status
-{
-	DEATH = 1,
-	ABORT = 2,
-	END = 3
-} t_thread_status;
-
 typedef struct s_log
 {
 	t_timeval time;
@@ -110,7 +103,7 @@ typedef struct s_log
 typedef struct s_srt
 {
 	long usec;
-	int status;
+	t_philo_status status;
 	t_dllnode *ptr;
 } t_srt;
 
@@ -132,6 +125,6 @@ int ft_atoi_int(const char *str);
 t_bool ft_isdecimal(char *str);
 char *ft_itoa(int n);
 void *ft_calloc(size_t count, size_t size);
-t_bool ft_usleep(int ms);
+t_bool ft_usleep(long us);
 
 #endif

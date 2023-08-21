@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 20:22:31 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 18:18:12 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void *time_thread_func(void *input_arg)
 	t_timeval time_lapse;
 	long time_lapse_usec;
 	t_bool time_thrd_end;
+	long	revision;
 
 	time_thrd_end = FALSE;
 	while (check_end_flag(arg) == 0)
@@ -60,10 +61,16 @@ void *time_thread_func(void *input_arg)
 		while (++idx < arg->philo_num)
 		{
 			pthread_mutex_lock(&arg->last_eat_mtx[idx]);
-			if (time_lapse_usec - arg->philo[idx].last_eat > arg->d_time * MS_TO_US)
+			if  (arg->philo[idx].last_eat == -1)
+			{
+				pthread_mutex_unlock(&arg->last_eat_mtx[idx]);
+				continue;
+			}
+			revision = time_lapse_usec - arg->philo[idx].last_eat - arg->d_time * MS_TO_US;
+			if (revision > 0)
 			{
 				time_thrd_end = TRUE;
-				if (die_report(arg, time_lapse_usec, idx) == FALSE)
+				if (die_report(arg, time_lapse_usec - revision, idx) == FALSE)
 				{
 					pthread_mutex_unlock(&arg->last_eat_mtx[idx]);
 					return (thread_error_end(arg));
