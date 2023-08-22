@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/08/22 18:07:58 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/08/23 00:40:34 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,7 @@ SRCS =	main.c \
 		resource_free_func.c \
 		srt_func.c \
 		time_thread_func.c\
-		util1.c \
-		util2.c \
+		util.c \
 		
 OBJS = 	${SRCS:.c=.o}
 

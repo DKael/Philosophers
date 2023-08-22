@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 17:04:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 01:53:33 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,16 @@ void	dll_del_node(t_dll *dll, t_dllnode *node, void (*del)(void *))
 	if (dll_is_in(dll, node) == TRUE)
 	{
 		if (dll->size == 1)
-			dll_init(dll);
+		{
+			dll->head.back = &(dll->tail);
+			dll->tail.front = &(dll->head);
+		}
 		else if (node->front == &(dll->head))
 		{
 			dll->head.back = node->back;
 			node->back->front = &(dll->head);
 		}
-		else if (node->front == &(dll->head))
+		else if (node->back == &(dll->tail))
 		{
 			dll->tail.front = node->front;
 			node->front->back = &(dll->tail);
@@ -53,30 +56,62 @@ int	dll_node_compare(t_dllnode *n1, t_dllnode *n2,
 		return (0);
 }
 
-t_bool	dll_node_move_to_another_dll_head(t_dllnode *n,
+void	dll_node_move_to_another_dll_head(t_dllnode *node,
 				t_dll *dll1, t_dll *dll2)
 {
-	if (n->front != T_NULL && n->back != T_NULL)
+	if (node->front != T_NULL && node->back != T_NULL)
 	{
-		n->back->front = n->front;
-		n->front->back = n->back;
+		if (dll1->size == 1)
+		{
+			dll1->head.back = &(dll1->tail);
+			dll1->tail.front = &(dll1->head);
+		}
+		else if (node->front == &(dll1->head))
+		{
+			dll1->head.back = node->back;
+			node->back->front = &(dll1->head);
+		}
+		else if (node->back == &(dll1->tail))
+		{
+			dll1->tail.front = node->front;
+			node->front->back = &(dll1->tail);
+		}
+		else
+		{
+			node->front->back = node->back;
+			node->back->front = node->front;
+		}
 		dll1->size--;
-		dll_add_head(dll2, n);
-		return (TRUE);
+		dll_add_head(dll2, node);
 	}
-	return (FALSE);
 }
 
-t_bool	dll_node_move_to_another_dll_tail(t_dllnode *n,
+void	dll_node_move_to_another_dll_tail(t_dllnode *node,
 				t_dll *dll1, t_dll *dll2)
 {
-	if (n->front != T_NULL && n->back != T_NULL)
+	if (node->front != T_NULL && node->back != T_NULL)
 	{
-		n->back->front = n->front;
-		n->front->back = n->back;
+		if (dll1->size == 1)
+		{
+			dll1->head.back = &(dll1->tail);
+			dll1->tail.front = &(dll1->head);
+		}
+		else if (node->front == &(dll1->head))
+		{
+			dll1->head.back = node->back;
+			node->back->front = &(dll1->head);
+		}
+		else if (node->back == &(dll1->tail))
+		{
+			dll1->tail.front = node->front;
+			node->front->back = &(dll1->tail);
+		}
+		else
+		{
+			node->front->back = node->back;
+			node->back->front = node->front;
+		}
 		dll1->size--;
-		dll_add_tail(dll2, n);
-		return (TRUE);
+		dll_add_tail(dll2, node);
 	}
-	return (FALSE);
 }

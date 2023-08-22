@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 18:05:31 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 00:00:26 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ typedef struct s_philo
 	pthread_mutex_t	*first_fork;
 	pthread_mutex_t	*second_fork;
 	long			last_eat;
+	t_bool			end;
 	pthread_t		thrd;
 	t_dll			logs;
 	t_arg			*arg;
@@ -137,6 +138,5 @@ int		ft_atoi_int(const char *str);
 t_bool	ft_isdecimal(char *str);
 void	*ft_calloc(size_t count, size_t size);
 t_bool	ft_usleep(long us);
-char	*ft_itoa(int n);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 22:28:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 23:56:15 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ static int	make_thread(t_arg *arg)
 		arg->philo[idx].second_fork = &(arg->fork[(idx + 1) % arg->philo_num]);
 		dll_init(&(arg->philo[idx].logs));
 		arg->philo[idx].arg = arg;
+		arg->philo[idx].end = FALSE;
 		if (pthread_create(&(arg->philo[idx].thrd), T_NULL,
 				philo_thread_func, &(arg->philo[idx])) != 0)
 			return (main_thread_end(arg, idx, "pthread create error!"));
@@ -95,6 +96,7 @@ static int	philosopher_end(t_arg *arg)
 	pthread_join(arg->philo[idx].thrd, T_NULL);
 	pthread_join(arg->philo[idx + 1].thrd, T_NULL);
 	arg_mutexes_destroy(arg);
+	philos_log_clear(arg, arg->philo_num);
 	arg_free(arg);
 	return (0);
 }

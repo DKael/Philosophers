@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 22:21:05 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 23:24:37 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static int	time_thread_func2(t_arg *arg,
 	while (++idx < arg->philo_num)
 	{
 		pthread_mutex_lock(&arg->last_eat_mtx[idx]);
-		if (arg->philo[idx].last_eat == -1)
+		if (arg->philo[idx].end == TRUE)
 		{
 			pthread_mutex_unlock(&arg->last_eat_mtx[idx]);
 			continue ;

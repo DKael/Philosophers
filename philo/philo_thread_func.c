@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 21:45:33 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 23:01:18 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static int	philo_thread_func2_3(t_philo *value, t_arg *arg)
 	if (arg->have_to_eat != -1 && ++(value->eat_cnt) == arg->have_to_eat)
 	{
 		pthread_mutex_lock(&arg->last_eat_mtx[value->idx]);
-		value->last_eat = -1;
+		value->end = TRUE;
 		pthread_mutex_unlock(&arg->last_eat_mtx[value->idx]);
 		if (report(value, EAT_DONE, arg) == FALSE)
 			return (1);

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:10:17 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 18:05:10 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 01:06:25 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static t_bool	report2(t_philo *value, t_log *log, t_arg *arg)
 {
 	t_dllnode	*log_node;
 
-	log_node = dll_new_node(log);
+	log_node = dll_new_node((void *)log);
 	if (log_node == T_NULL)
 	{
 		free(log);
@@ -66,7 +66,7 @@ t_bool	die_report(t_arg *arg, long time_lapse_usec, int idx)
 	log->usec = time_lapse_usec;
 	log->who = idx + 1;
 	log->status = DIE;
-	log_node = dll_new_node(log);
+	log_node = dll_new_node((void *)log);
 	if (log_node == T_NULL)
 	{
 		free(log);
