@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/21 20:26:16 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 17:54:56 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,14 @@
 typedef int				t_bool;
 
 typedef struct timeval	t_timeval;
+
+typedef enum e_thread_status
+{
+	NORMAL,
+	ABORT,
+	PHILO_DIE,
+	END
+}	t_thread_status;
 typedef struct s_arg
 {
 	int				philo_num;
@@ -56,7 +64,7 @@ typedef struct s_arg
 	t_bool			start_flag_chk;
 	pthread_mutex_t	end_flag_mtx;
 	t_bool			end_flag_mtx_chk;
-	t_bool			end_flag;
+	t_thread_status	end_flag;
 	pthread_t		print_thrd;
 	pthread_t		time_thrd;
 	t_timeval		start;
@@ -81,7 +89,8 @@ typedef enum e_philo_status
 	GET_FORK,
 	EATING,
 	SLEEPING,
-	DIE
+	DIE,
+	EAT_DONE
 }	t_philo_status;
 
 typedef struct s_log
@@ -99,32 +108,33 @@ typedef struct s_srt
 	t_dllnode		*ptr;
 }	t_srt;
 
-int		check_end_flag(t_arg *arg);
-
+// error.c
 int		err_msg(t_arg *arg, const char *msg, int return_code);
+void	*thread_error_end(t_arg *arg);
+int		check_end_flag(t_arg *arg);
+// init.c
+int		arg_init(t_arg *data, int argc, char **argv);
+int		arg_mutexes_init(t_arg *arg, int *mtx_cnt);
+// philo_report.c
+t_bool	report(t_philo *value, t_philo_status status, t_arg *arg);
+t_bool	die_report(t_arg *arg, long time_lapse_usec, int idx);
+// philo_thread_func.c
+void	*philo_thread_func(void *arg);
+// print_thread_func.c
+void	*print_thread_func(void *input_arg);
+// resource_free_func.c
 void	arg_free(t_arg *data);
 void	log_delete_func(void *content);
-void	*thread_error_end(t_arg *arg);
 void	philos_log_clear(t_arg *arg, int cnt);
-void arg_pthreads_join(t_arg *arg, int cnt);
-void arg_mutexes_destroy(t_arg *arg);
-int	check_end_flag(t_arg *arg);
-int	arg_mutexes_init(t_arg *arg, int *mtx_cnt);
-int	main_thread_end(t_arg *arg, int idx, const char *msg);
-
-void	*philo_thread_func(void *arg);
-void	*print_thread_func(void *arg);
+void	arg_pthreads_join(t_arg *arg, int cnt);
+void	arg_mutexes_destroy(t_arg *arg);
+// time_thread_func.c
 void	*time_thread_func(void *arg);
-t_bool	report(t_philo *value, t_philo_status status, t_arg *arg);
-
-t_bool die_report(t_arg *arg, long time_lapse_usec, int idx);
-
-int		arg_init(t_arg *data, int argc, char **argv);
-
+//util.c
 int		ft_atoi_int(const char *str);
 t_bool	ft_isdecimal(char *str);
-char	*ft_itoa(int n);
 void	*ft_calloc(size_t count, size_t size);
 t_bool	ft_usleep(long us);
+char	*ft_itoa(int n);
 
 #endif

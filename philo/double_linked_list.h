@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:16:13 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/21 19:26:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 17:44:08 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,9 @@ t_dllnode	*dll_new_node(void *contents);
 void		dll_del_node(t_dll *dll, t_dllnode *node, void (*del)(void *));
 int			dll_node_compare(t_dllnode *n1, t_dllnode *n2,
 				int (*compare)(t_dllnode *, t_dllnode *));
+t_bool		dll_node_move_to_another_dll_head(t_dllnode *n,
+				t_dll *dll1, t_dll *dll2);
+t_bool		dll_node_move_to_another_dll_tail(t_dllnode *n,
+				t_dll *dll1, t_dll *dll2);
 
 #endif

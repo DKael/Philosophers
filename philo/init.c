@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/21 20:02:18 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 17:48:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static int	arg_init2(t_arg *arg, int argc, char **argv)
 	arg->log_mtx_cnt = -1;
 	arg->start_flag_chk = FALSE;
 	arg->end_flag_mtx_chk = FALSE;
-	arg->end_flag = FALSE;
+	arg->end_flag = NORMAL;
 	return (arg_init3(arg));
 }
 
@@ -92,5 +92,14 @@ static int	arg_init3(t_arg *arg)
 		arg_free(arg);
 		return (err_msg(arg, "malloc error!", 1));
 	}
+	return (0);
+}
+
+int	arg_mutexes_init(t_arg *arg, int *mtx_cnt)
+{
+	*mtx_cnt = -1;
+	while (++(*mtx_cnt) < arg->philo_num)
+		if (pthread_mutex_init(&arg->fork[*mtx_cnt], T_NULL) != 0)
+			return (1);
 	return (0);
 }
