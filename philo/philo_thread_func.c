@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 16:10:45 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 18:06:49 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ void	*philo_thread_func(void *param)
 
 static void	*philo_thread_func2_1(t_philo *value, t_arg *arg)
 {
-	t_bool	result;
 	int		func_result;
 
 	while (check_end_flag(arg) == NORMAL)
@@ -83,7 +82,7 @@ static int	philo_thread_func2_2(t_philo *value, t_arg *arg)
 		pthread_mutex_unlock(value->second_fork);
 		return (1);
 	}
-	return (2);
+	return (0);
 }
 
 static int	philo_thread_func2_3(t_philo *value, t_arg *arg)

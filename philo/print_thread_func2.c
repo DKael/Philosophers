@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 17:42:48 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 17:54:20 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 18:08:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ static int	log_collect(t_arg *arg, t_dll *total_logs, long time_offset)
 			&& ((t_log *)temp_dll->head.back->contents)->usec < time_lapse_usec
 			- time_offset)
 			dll_node_move_to_another_dll_tail(temp_dll->head.back,
-				temp_dll, &total_logs);
+				temp_dll, total_logs);
 		pthread_mutex_unlock(&arg->log_mtx[idx]);
 	}
 	return (0);
@@ -81,7 +81,7 @@ static t_srt	*srt_log_sorting(t_dll *total_logs)
 	srt = (t_srt *)malloc(sizeof(t_srt) * total_logs->size);
 	if (srt == T_NULL)
 	{
-		dll_clear(&total_logs, log_delete_func);
+		dll_clear(total_logs, log_delete_func);
 		return (T_NULL);
 	}
 	idx = -1;
@@ -128,7 +128,7 @@ static int	log_print_case_die(t_arg *arg, t_dll *total_logs,
 		t_log *temp_log, t_srt *srt)
 {
 	printf("%ld %d died\n", temp_log->usec / 1000, temp_log->who);
-	dll_clear(&total_logs, log_delete_func);
+	dll_clear(total_logs, log_delete_func);
 	free(srt);
 	pthread_mutex_lock(&arg->end_flag_mtx);
 	arg->end_flag = PHILO_DIE;

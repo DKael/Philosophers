@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/08/21 13:27:39 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/08/22 18:07:58 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,11 +16,17 @@ SRCS =	main.c \
 		double_linked_list3.c \
 		error.c \
 		init.c \
+		philo_report.c \
 		philo_thread_func.c \
-		print_thread_func.c \
+		philo.c \
+		print_thread_func1.c \
+		print_thread_func2.c \
 		quick_sort.c \
+		resource_free_func.c \
+		srt_func.c \
 		time_thread_func.c\
-		util.c \
+		util1.c \
+		util2.c \
 		
 OBJS = 	${SRCS:.c=.o}
 
