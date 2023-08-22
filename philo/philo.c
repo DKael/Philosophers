@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 16:18:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 22:28:57 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,10 +86,12 @@ static int	philosopher_end(t_arg *arg)
 	idx = -1;
 	while (++idx < arg->philo_num)
 		pthread_join(arg->philo[idx].thrd, T_NULL);
-	pthread_mutex_lock(&(arg->end_flag_mtx));
 	if (check_end_flag(arg) == NORMAL)
+	{
+		pthread_mutex_lock(&arg->end_flag_mtx);
 		arg->end_flag = END;
-	pthread_mutex_unlock(&(arg->end_flag_mtx));
+		pthread_mutex_unlock(&arg->end_flag_mtx);
+	}
 	pthread_join(arg->philo[idx].thrd, T_NULL);
 	pthread_join(arg->philo[idx + 1].thrd, T_NULL);
 	arg_mutexes_destroy(arg);

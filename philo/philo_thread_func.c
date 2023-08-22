@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 18:06:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/22 21:45:33 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,7 @@ static void	*philo_thread_func2_1(t_philo *value, t_arg *arg)
 	{
 		pthread_mutex_lock(value->first_fork);
 		pthread_mutex_lock(value->second_fork);
-		func_result = philo_thread_func2_2(value, arg);
-		if (func_result == 1)
+		if (philo_thread_func2_2(value, arg) == 1)
 			return (thread_error_end(arg));
 		pthread_mutex_unlock(value->first_fork);
 		pthread_mutex_unlock(value->second_fork);
