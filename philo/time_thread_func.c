@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/21 18:18:12 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 19:27:27 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,13 @@ t_bool die_report(t_arg *arg, long time_lapse_usec, int idx)
 	t_dllnode *log_node;
 
 	log = (t_log *)malloc(sizeof(t_log));
-	if (log == NULL)
+	if (log == T_NULL)
 		return (FALSE);
 	log->usec = time_lapse_usec;
 	log->who = idx + 1;
 	log->status = DIE;
 	log_node = dll_new_node(log);
-	if (log_node == NULL)
+	if (log_node == T_NULL)
 	{
 		free(log);
 		return (FALSE);
@@ -43,7 +43,7 @@ void *time_thread_func(void *input_arg)
 	pthread_mutex_lock(&arg->start_flag);
 	pthread_mutex_unlock(&arg->start_flag);
 	if (check_end_flag(arg) != 0)
-		return (NULL);
+		return (T_NULL);
 
 	int idx;
 	t_timeval time_lapse;
@@ -54,7 +54,7 @@ void *time_thread_func(void *input_arg)
 	time_thrd_end = FALSE;
 	while (check_end_flag(arg) == 0)
 	{
-		if (gettimeofday(&time_lapse, NULL) != 0)
+		if (gettimeofday(&time_lapse, T_NULL) != 0)
 			thread_error_end(arg);
 		time_lapse_usec = (time_lapse.tv_sec - arg->start.tv_sec) * S_TO_US + (time_lapse.tv_usec - arg->start.tv_usec);
 		idx = -1;
@@ -81,5 +81,5 @@ void *time_thread_func(void *input_arg)
 		if (time_thrd_end == TRUE)
 			break;
 	}
-	return (NULL);
+	return (T_NULL);
 }

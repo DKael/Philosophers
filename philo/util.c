@@ -65,8 +65,8 @@ char	*ft_itoa(int n)
 	if (n == 0)
 	{
 		result = (char *)malloc(sizeof(char) * 2);
-		if (result == NULL)
-			return (NULL);
+		if (result == T_NULL)
+			return (T_NULL);
 		result[0] = '0';
 		result[1] = '\0';
 		return (result);
@@ -89,8 +89,8 @@ static char	*case_pos(int n, int digit)
 	char	*result;
 
 	result = (char *)malloc(sizeof(char) * (digit + 1));
-	if (result == NULL)
-		return (NULL);
+	if (result == T_NULL)
+		return (T_NULL);
 	result[digit--] = '\0';
 	while (n != 0)
 	{
@@ -105,8 +105,8 @@ static char	*case_neg(int n, int digit)
 	char	*result;
 
 	result = (char *)malloc(sizeof(char) * (digit + 2));
-	if (result == NULL)
-		return (NULL);
+	if (result == T_NULL)
+		return (T_NULL);
 	result[0] = '-';
 	result[digit + 1] = '\0';
 	while (n != 0)
@@ -129,10 +129,10 @@ void	*ft_calloc(size_t count, size_t size)
 		return (malloc(0));
 	total_size = count * size;
 	if (ULLONG_MAX / size < count)
-		return ((NULL));
+		return ((T_NULL));
 	result = malloc(total_size);
-	if (result == NULL)
-		return (NULL);
+	if (result == T_NULL)
+		return (T_NULL);
 	temp_ptr = (char *)result;
 	while (index < total_size)
 	{
@@ -149,7 +149,7 @@ t_bool ft_usleep(long us)
 	long time_lapse;
 	long sleep_time;
 
-	if (gettimeofday(&start, NULL) != 0 || gettimeofday(&t, NULL) != 0)
+	if (gettimeofday(&start, T_NULL) != 0 || gettimeofday(&t, T_NULL) != 0)
 		return (FALSE);
 	time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US + (t.tv_usec - start.tv_usec);
 	sleep_time = us;
@@ -161,7 +161,7 @@ t_bool ft_usleep(long us)
 			sleep_time = 10;
 		if (usleep(sleep_time) != 0)
 			printf("usleep function is interrupted by a signal\n");
-		if (gettimeofday(&t, NULL) != 0)
+		if (gettimeofday(&t, T_NULL) != 0)
 			return (FALSE);
 		time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US + (t.tv_usec - start.tv_usec);
 	}

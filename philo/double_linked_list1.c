@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:22 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 19:09:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 19:27:38 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 void	dll_init(t_dll *dll)
 {
-	dll->head.front = NULL;
+	dll->head.front = T_NULL;
 	dll->head.back = &(dll->tail);
 	dll->tail.front = &(dll->head);
-	dll->tail.back = NULL;
+	dll->tail.back = T_NULL;
 	dll->size = 0;
 }
 
@@ -63,5 +63,5 @@ t_dllnode	*dll_find(t_dll *dll, void *contents, t_bool (*f)(void *, void *))
 			return (next_node);
 		next_node = next_node->back;
 	}
-	return (NULL);
+	return (T_NULL);
 }

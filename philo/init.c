@@ -6,18 +6,18 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/21 16:45:59 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 20:02:18 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-static int arg_init2(t_arg *arg, int argc, char **argv);
-static int arg_init3(t_arg *arg);
+static int	arg_init2(t_arg *arg, int argc, char **argv);
+static int	arg_init3(t_arg *arg);
 
-int arg_init(t_arg *arg, int argc, char **argv)
+int	arg_init(t_arg *arg, int argc, char **argv)
 {
-	int idx;
+	int	idx;
 
 	arg->program_name = argv[0];
 	idx = 0;
@@ -43,21 +43,22 @@ int arg_init(t_arg *arg, int argc, char **argv)
 	return (arg_init2(arg, argc, argv));
 }
 
-static int arg_init2(t_arg *arg, int argc, char **argv)
+static int	arg_init2(t_arg *arg, int argc, char **argv)
 {
 	arg->have_to_eat = -1;
 	if (argc == 6)
 	{
 		arg->have_to_eat = ft_atoi_int(argv[5]);
 		if (arg->have_to_eat == 0 && argv[5][0] != '0')
-			return (err_msg(arg, "Invalid input! Wrong range of input value.", 1));
+			return (err_msg(arg,
+					"Invalid input! Wrong range of input value.", 1));
 	}
-	arg->philo = NULL;
-	arg->fork = NULL;
+	arg->philo = T_NULL;
+	arg->fork = T_NULL;
 	arg->fork_cnt = -1;
-	arg->last_eat_mtx = NULL;
+	arg->last_eat_mtx = T_NULL;
 	arg->last_eat_mtx_cnt = -1;
-	arg->log_mtx = NULL;
+	arg->log_mtx = T_NULL;
 	arg->log_mtx_cnt = -1;
 	arg->start_flag_chk = FALSE;
 	arg->end_flag_mtx_chk = FALSE;
@@ -65,28 +66,31 @@ static int arg_init2(t_arg *arg, int argc, char **argv)
 	return (arg_init3(arg));
 }
 
-static int arg_init3(t_arg *arg)
+static int	arg_init3(t_arg *arg)
 {
 	arg->philo = (t_philo *)ft_calloc(arg->philo_num + 2, sizeof(t_philo));
-    if (arg->philo == NULL)
-        return (err_msg(arg, "malloc error!", 1));
-    arg->fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * arg->philo_num);
-    if (arg->fork == NULL)
-    {
-        arg_free(arg);
-        return (err_msg(arg, "malloc error!", 1));
-    }
-    arg->last_eat_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * arg->philo_num);
-    if (arg->fork == NULL)
-    {
-        arg_free(arg);
-        return (err_msg(arg, "malloc error!", 1));
-    }
-    arg->log_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * arg->philo_num);
-    if (arg->fork == NULL)
-    {
-        arg_free(arg);
-        return (err_msg(arg, "malloc error!", 1));
-    }
+	if (arg->philo == T_NULL)
+		return (err_msg(arg, "malloc error!", 1));
+	arg->fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
+			* arg->philo_num);
+	if (arg->fork == T_NULL)
+	{
+		arg_free(arg);
+		return (err_msg(arg, "malloc error!", 1));
+	}
+	arg->last_eat_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
+			* arg->philo_num);
+	if (arg->fork == T_NULL)
+	{
+		arg_free(arg);
+		return (err_msg(arg, "malloc error!", 1));
+	}
+	arg->log_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
+			* arg->philo_num);
+	if (arg->fork == T_NULL)
+	{
+		arg_free(arg);
+		return (err_msg(arg, "malloc error!", 1));
+	}
 	return (0);
 }

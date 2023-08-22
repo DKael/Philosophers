@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/21 18:18:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 19:27:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void *print_thread_func(void *input_arg)
 	{
 		if (usleep(1000) == EINTR)
 			printf("Interrupted by a signa\n");
-		if (gettimeofday(&time_lapse, NULL) != 0)
+		if (gettimeofday(&time_lapse, T_NULL) != 0)
 			return (thread_error_end(arg));
 		time_lapse_usec = (time_lapse.tv_sec - arg->start.tv_sec) * S_TO_US + (time_lapse.tv_usec - arg->start.tv_usec);
 		idx = -1;
@@ -91,7 +91,7 @@ void *print_thread_func(void *input_arg)
 		if (total_logs.size == 0)
 			continue;
 		srt = (t_srt *)malloc(sizeof(t_srt) * total_logs.size);
-		if (srt == NULL)
+		if (srt == T_NULL)
 		{
 			dll_clear(&total_logs, log_delete_func);
 			return (thread_error_end(arg));
@@ -126,11 +126,11 @@ void *print_thread_func(void *input_arg)
 				pthread_mutex_lock(&arg->end_flag_mtx);
 				arg->end_flag = TRUE;
 				pthread_mutex_unlock(&arg->end_flag_mtx);
-				return (NULL);
+				return (T_NULL);
 			}
 		}
 		dll_clear(&total_logs, log_delete_func);
 		free(srt);
 	}
-	return (NULL);
+	return (T_NULL);
 }

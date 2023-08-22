@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/20 19:09:51 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/21 19:27:37 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,10 @@ t_dllnode	*dll_new_node(void *contents)
 	t_dllnode	*result;
 
 	result = (t_dllnode *)malloc(sizeof(t_dllnode));
-	if (result == NULL)
-		return (NULL);
+	if (result == T_NULL)
+		return (T_NULL);
 	result->contents = contents;
-	result->front = NULL;
-	result->back = NULL;
+	result->front = T_NULL;
+	result->back = T_NULL;
 	return (result);
 }
