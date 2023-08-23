@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/08/23 09:22:00 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/08/23 09:25:41 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,9 +39,14 @@ NAME = philo
 
 DATA_RACE_CHECK = 0
 
+ADDRESS_CHECK = 0
+
 ifeq ($(DATA_RACE_CHECK),1)
 ${NAME} : ${TOTAL_OBJS}
 	${CC} ${CFLAGS} ${TOTAL_OBJS} -g -fsanitize=thread -o $@
+else ifeq ($(ADDRESS_CHECK),1)
+${NAME} : ${TOTAL_OBJS}
+	${CC} ${CFLAGS} ${TOTAL_OBJS} -g -fsanitize=address -o $@
 else
 ${NAME} : ${TOTAL_OBJS}
 	${CC} ${CFLAGS} ${TOTAL_OBJS} -o $@
@@ -54,6 +59,9 @@ all : ${NAME}
 
 data_race_check : 
 	@make DATA_RACE_CHECK=1
+
+address_check : 
+	@make ADDRESS_CHECK=1
 
 clean:
 	rm -f ${OBJS}
