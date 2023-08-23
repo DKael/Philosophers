@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 23:56:15 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 09:17:11 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,11 @@ static int	make_thread(t_arg *arg)
 
 static int	mutexes_init(t_arg *arg)
 {
-	if (arg_mutexes_init(arg, &(arg->fork_cnt)) != 0
-		|| arg_mutexes_init(arg, &(arg->last_eat_mtx_cnt)) != 0
-		|| arg_mutexes_init(arg, &(arg->log_mtx_cnt)) != 0
+	if (arg_mutexes_init(arg->fork, arg->philo_num, &arg->fork_cnt) != 0
+		|| arg_mutexes_init(arg->last_eat_mtx,
+			arg->philo_num, &arg->last_eat_mtx_cnt) != 0
+		|| arg_mutexes_init(arg->log_mtx,
+			arg->philo_num, &arg->log_mtx_cnt) != 0
 		|| gettimeofday(&(arg->start), T_NULL) != 0)
 		return (main_thread_end(arg, arg->philo_num + 2,
 				"pthread mutex init error!"));

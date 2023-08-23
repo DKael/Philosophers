@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 22:32:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 09:12:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,11 +95,11 @@ static int	arg_init3(t_arg *arg)
 	return (0);
 }
 
-int	arg_mutexes_init(t_arg *arg, int *mtx_cnt)
+int	arg_mutexes_init(pthread_mutex_t *lst, int num, int *mtx_cnt)
 {
 	*mtx_cnt = -1;
-	while (++(*mtx_cnt) < arg->philo_num)
-		if (pthread_mutex_init(&arg->fork[*mtx_cnt], T_NULL) != 0)
+	while (++(*mtx_cnt) < num)
+		if (pthread_mutex_init(&lst[*mtx_cnt], T_NULL) != 0)
 			return (1);
 	return (0);
 }

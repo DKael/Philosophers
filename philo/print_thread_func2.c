@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 17:42:48 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 02:14:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 09:21:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ static void	log_collect(t_arg *arg, t_dll *total_logs,
 	int			idx;
 	long		usec;
 	t_dllnode	*temp_dll;
-	t_dllnode	*temp_node;
 
 	usec = (t_lapse.tv_sec - arg->start.tv_sec)
 		* S_TO_US + (t_lapse.tv_usec - arg->start.tv_usec);
@@ -66,13 +65,8 @@ static void	log_collect(t_arg *arg, t_dll *total_logs,
 		pthread_mutex_lock(&arg->log_mtx[idx]);
 		while (temp_dll->back != &(arg->philo[idx].logs.tail)
 			&& ((t_log *)temp_dll->back->contents)->usec < usec - t_offset)
-		{
-			temp_node = temp_dll->back;
-			temp_dll->back->back->front = temp_dll;
-			temp_dll->back = temp_dll->back->back;
-			arg->philo[idx].logs.size--;
-			dll_add_tail(total_logs, temp_node);
-		}
+			dll_node_move_to_another_dll_tail(temp_dll->back,
+				&arg->philo[idx].logs, total_logs);
 		pthread_mutex_unlock(&arg->log_mtx[idx]);
 	}
 }

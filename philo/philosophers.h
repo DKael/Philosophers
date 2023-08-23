@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 00:00:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 09:13:10 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ void	*thread_error_end(t_arg *arg);
 int		check_end_flag(t_arg *arg);
 // init.c
 int		arg_init(t_arg *data, int argc, char **argv);
-int		arg_mutexes_init(t_arg *arg, int *mtx_cnt);
+int		arg_mutexes_init(pthread_mutex_t *lst, int num, int *mtx_cnt);
 // philo_report.c
 t_bool	report(t_philo *value, t_philo_status status, t_arg *arg);
 t_bool	die_report(t_arg *arg, long time_lapse_usec, int idx);

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 01:53:33 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 02:25:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	dll_del_node(t_dll *dll, t_dllnode *node, void (*del)(void *))
 {
 	if (dll_is_in(dll, node) == TRUE)
 	{
-		if (dll->size == 1)
+		if (dll->size-- == 1)
 		{
 			dll->head.back = &(dll->tail);
 			dll->tail.front = &(dll->head);
@@ -38,7 +38,6 @@ void	dll_del_node(t_dll *dll, t_dllnode *node, void (*del)(void *))
 		}
 		del(node->contents);
 		free(node);
-		dll->size--;
 	}
 }
 
