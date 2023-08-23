@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:12:59 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 14:41:49 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,14 +80,14 @@ static int	arg_init3(t_arg *arg)
 	}
 	arg->last_eat_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
 			* arg->philo_num);
-	if (arg->fork == T_NULL)
+	if (arg->last_eat_mtx == T_NULL)
 	{
 		arg_free(arg);
 		return (err_msg(arg, "malloc error!", 1));
 	}
 	arg->log_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
 			* arg->philo_num);
-	if (arg->fork == T_NULL)
+	if (arg->log_mtx == T_NULL)
 	{
 		arg_free(arg);
 		return (err_msg(arg, "malloc error!", 1));

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:13:10 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/23 14:02:28 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,6 @@ typedef struct s_arg
 	pthread_mutex_t	end_flag_mtx;
 	t_bool			end_flag_mtx_chk;
 	t_thread_status	end_flag;
-	pthread_t		print_thrd;
-	pthread_t		time_thrd;
 	t_timeval		start;
 	char			*program_name;
 }	t_arg;
