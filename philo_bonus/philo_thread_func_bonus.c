@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_thread_func_bonus.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 14:40:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 19:04:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@ void	*philo_thread_func(t_arg *arg, t_philo *value)
 	sem_post(arg->start_flag.sem);
 	if (check_end_flag(arg) != NORMAL)
 		return (T_NULL);
-	printf("%d test2\n", value->idx);
+	printf("%d test12, errno : %d\n", value->idx, errno);
 	sem_wait_nointr(arg->last_eat_sem[value->idx].sem);
 	value->last_eat = 0;
 	sem_post(arg->last_eat_sem[value->idx].sem);
-	printf("%d test3\n", value->idx);
+	printf("%d test13\n", value->idx);
 	if (arg->philo_num == 1)
 	{
 		while (check_end_flag(arg) == 0)

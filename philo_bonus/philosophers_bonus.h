@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 13:39:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 19:04:19 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,10 @@
 # include "double_linked_list_bonus.h"
 # include "ft_errno_bonus.h"
 # include "quick_sort_bonus.h"
+
+
+#include "errno.h"
+
 
 # if !defined(TRUE) && !defined(FALSE)
 #  define TRUE 1
@@ -155,4 +159,5 @@ size_t	ft_strlen(const char *s);
 
 void	sem_wait_nointr(sem_t *sem);
 void	ft_sem_destroy(t_csem *csem);
+sem_t	*ft_sem_open(const char *name, mode_t mode, unsigned int value);
 #endif

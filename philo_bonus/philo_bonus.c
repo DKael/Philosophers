@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   philo_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 14:32:50 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 19:04:28 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
-
-#include "errno.h"
 
 static int	make_philo_process(t_arg *arg);
 static int	sems_init(t_arg *arg);
@@ -26,9 +24,9 @@ void	sem_wait_nointr(sem_t *sem)
 	result = sem_wait(sem);
 	while (result == -1)
 	{
-		result = sem_wait(sem);
-		printf("errno : %d\n", errno);
+		printf("test, errno : %d\n", errno);
 		sleep(1);
+		result = sem_wait(sem);
 	}
 		
 }
@@ -37,6 +35,19 @@ void	ft_sem_destroy(t_csem *csem)
 {
 	sem_close(csem->sem);
 	sem_unlink(csem->name);
+}
+
+sem_t	*ft_sem_open(const char *name, mode_t mode, unsigned int value)
+{
+	sem_t	*temp;
+
+	temp = sem_open(name, O_EXCL | O_CREAT, mode, value);
+	if (temp == SEM_FAILED)
+	{
+		sem_unlink(name);
+		temp = sem_open(name, O_EXCL | O_CREAT, mode, value);
+	}
+	return (temp);		
 }
 
 int	philosopher_start(int argc, char **argv)
@@ -49,13 +60,17 @@ int	philosopher_start(int argc, char **argv)
 	if (arg_init(arg, argc, argv) != 0)
 		return (1);
 	arg->start_flag.name = "start_flag";
-	arg->start_flag.sem = sem_open("start_flag", O_CREAT, 0644, 1);
+	arg->start_flag.sem = ft_sem_open("start_flag", 0644, 1);
+	
 	if (arg->start_flag.sem == SEM_FAILED)
+	{
+		printf("fail test0-1\n");
 		return (main_process_end(arg, 0, "sem open failed!"));
+	}
 	arg->start_flag_chk = TRUE;
 	sem_wait_nointr(arg->start_flag.sem);
 	arg->end_flag_sem.name = "end_flag_sem";
-	arg->end_flag_sem.sem = sem_open("end_flag_sem", O_CREAT, 0644, 1);
+	arg->end_flag_sem.sem = ft_sem_open("end_flag_sem", 0644, 1);
 	if (arg->end_flag_sem.sem == SEM_FAILED)
 		return (main_process_end(arg, 0, "sem open failed!"));
 	arg->end_flag_sem_chk = TRUE;
@@ -99,7 +114,7 @@ static int	sems_init(t_arg *arg)
 				"pthread create error!"));
 	arg->time_thrd_chk = TRUE;
 	arg->fork.name = "fork";
-	arg->fork.sem = sem_open(arg->fork.name, O_CREAT, 0644, arg->philo_num);
+	arg->fork.sem = ft_sem_open(arg->fork.name, 0644, arg->philo_num);
 	if (arg->fork.sem == SEM_FAILED)
 		return (main_process_end(arg, arg->philo_num, "sem open failed!"));
 	arg->fork_chk = TRUE;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 11:07:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 18:54:03 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ int	sems_open(t_csem *lst, int num, int *sem_cnt, const char *name)
 			return (1);
 		lst[*sem_cnt].name = name_temp;
 		free(number);
-		lst[*sem_cnt].sem = sem_open(lst[*sem_cnt].name, O_CREAT, 0644, 1);
+		lst[*sem_cnt].sem = ft_sem_open(lst[*sem_cnt].name, 0644, 1);
 		if (lst[*sem_cnt].sem == SEM_FAILED)
 		{
 			free(name_temp);
