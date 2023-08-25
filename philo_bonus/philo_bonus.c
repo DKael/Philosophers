@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   philo_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 16:30:10 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 14:32:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
 
+#include "errno.h"
+
 static int	make_philo_process(t_arg *arg);
-static int	mutexes_init(t_arg *arg);
+static int	sems_init(t_arg *arg);
 static int	philosopher_end(t_arg *arg);
-static int	main_thread_end(t_arg *arg, int idx, const char *msg);
+static int	main_process_end(t_arg *arg, int idx, const char *msg);
 
 void	sem_wait_nointr(sem_t *sem)
 {
@@ -23,7 +25,18 @@ void	sem_wait_nointr(sem_t *sem)
 
 	result = sem_wait(sem);
 	while (result == -1)
+	{
 		result = sem_wait(sem);
+		printf("errno : %d\n", errno);
+		sleep(1);
+	}
+		
+}
+
+void	ft_sem_destroy(t_csem *csem)
+{
+	sem_close(csem->sem);
+	sem_unlink(csem->name);
 }
 
 int	philosopher_start(int argc, char **argv)
@@ -35,20 +48,18 @@ int	philosopher_start(int argc, char **argv)
 		return (1);
 	if (arg_init(arg, argc, argv) != 0)
 		return (1);
-	arg->start_flag = sem_open("start_flag", O_CREAT, 0644, 1);
-	if (arg->start_flag == SEM_FAILED)
-		return (arg_free(arg));
+	arg->start_flag.name = "start_flag";
+	arg->start_flag.sem = sem_open("start_flag", O_CREAT, 0644, 1);
+	if (arg->start_flag.sem == SEM_FAILED)
+		return (main_process_end(arg, 0, "sem open failed!"));
 	arg->start_flag_chk = TRUE;
-	sem_wait_nointr(arg->start_flag);
-	arg->end_flag_sem = sem_open("end_flag_sem", O_CREAT, 0644, 1);
-	if (arg->end_flag_sem == SEM_FAILED)
-	{
-		sem_close(arg->start_flag);
-		sem_unlink("start_flag");
-		return (arg_free(&arg));
-	}
+	sem_wait_nointr(arg->start_flag.sem);
+	arg->end_flag_sem.name = "end_flag_sem";
+	arg->end_flag_sem.sem = sem_open("end_flag_sem", O_CREAT, 0644, 1);
+	if (arg->end_flag_sem.sem == SEM_FAILED)
+		return (main_process_end(arg, 0, "sem open failed!"));
 	arg->end_flag_sem_chk = TRUE;
-	return (make_philo_process(&arg));
+	return (make_philo_process(arg));
 }
 
 static int	make_philo_process(t_arg *arg)
@@ -62,33 +73,43 @@ static int	make_philo_process(t_arg *arg)
 		dll_init(&(arg->philo[idx].logs));
 		arg->philo[idx].arg = arg;
 		arg->philo[idx].end = FALSE;
+		arg->philo[idx].eat_cnt = 0;
 		arg->philo[idx].philo_pid = fork();
 		if (arg->philo[idx].philo_pid == -1)
-			;
+			return (main_process_end(arg, idx, "fork() error!"));
 		else if (arg->philo[idx].philo_pid == 0)
-			break;
+		{
+			philo_thread_func(arg, &arg->philo[idx]);
+			exit(0);
+		}
 	}
 	if (pthread_create(&(arg->print_thrd), T_NULL,
 			print_thread_func, arg) != 0)
-		return (main_thread_end(arg, arg->philo_num,
+		return (main_process_end(arg, arg->philo_num,
 				"pthread create error!"));
-	if (pthread_create(&(arg->time_thrd), T_NULL,
-			time_thread_func, arg) != 0)
-		return (main_thread_end(arg, arg->philo_num + 1,
-				"pthread create error!"));
-	return (mutexes_init(arg));
+	arg->print_thrd_chk = TRUE;
+	return (sems_init(arg));
 }
 
-static int	mutexes_init(t_arg *arg)
+static int	sems_init(t_arg *arg)
 {
-	if (arg_mutexes_init(arg->fork, arg->philo_num, &arg->fork_cnt) != 0
-		|| arg_mutexes_init(arg->last_eat_mtx,
-			arg->philo_num, &arg->last_eat_mtx_cnt) != 0
-		|| arg_mutexes_init(arg->log_mtx,
-			arg->philo_num, &arg->log_mtx_cnt) != 0
+	if (pthread_create(&(arg->time_thrd), T_NULL,
+			time_thread_func, arg) != 0)
+		return (main_process_end(arg, arg->philo_num,
+				"pthread create error!"));
+	arg->time_thrd_chk = TRUE;
+	arg->fork.name = "fork";
+	arg->fork.sem = sem_open(arg->fork.name, O_CREAT, 0644, arg->philo_num);
+	if (arg->fork.sem == SEM_FAILED)
+		return (main_process_end(arg, arg->philo_num, "sem open failed!"));
+	arg->fork_chk = TRUE;
+	if (sems_open(arg->last_eat_sem, arg->philo_num,
+			&arg->last_eat_sem_cnt, "last_eat_sem") != 0
+		|| sems_open(arg->log_sem, arg->philo_num,
+			&arg->log_sem_cnt, "log_sem") != 0
 		|| gettimeofday(&(arg->start), T_NULL) != 0)
-		return (main_thread_end(arg, arg->philo_num + 2,
-				"pthread mutex init error!"));
+		return (main_process_end(arg, arg->philo_num,
+				"sem open failed!"));
 	return (philosopher_end(arg));
 }
 
@@ -96,33 +117,37 @@ static int	philosopher_end(t_arg *arg)
 {
 	int	idx;
 
-	pthread_mutex_unlock(&(arg->start_flag));
+	sem_post(arg->start_flag.sem);
 	idx = -1;
 	while (++idx < arg->philo_num)
-		pthread_join(arg->philo[idx].thrd, T_NULL);
+		waitpid(arg->philo[idx].philo_pid, T_NULL, 0);
 	if (check_end_flag(arg) == NORMAL)
 	{
-		pthread_mutex_lock(&arg->end_flag_mtx);
+		sem_wait_nointr(arg->end_flag_sem.sem);
 		arg->end_flag = END;
-		pthread_mutex_unlock(&arg->end_flag_mtx);
+		sem_post(arg->end_flag_sem.sem);
 	}
-	pthread_join(arg->philo[idx].thrd, T_NULL);
-	pthread_join(arg->philo[idx + 1].thrd, T_NULL);
-	arg_mutexes_destroy(arg);
+	pthread_join(arg->print_thrd, T_NULL);
+	pthread_join(arg->time_thrd, T_NULL);
 	philos_log_clear(arg, arg->philo_num);
+	arg_sems_destroy(arg);
 	arg_free(arg);
 	return (0);
 }
 
-static int	main_thread_end(t_arg *arg, int idx, const char *msg)
+static int	main_process_end(t_arg *arg, int idx, const char *msg)
 {
-	sem_wait(arg->end_flag_sem);
+	sem_wait_nointr(arg->end_flag_sem.sem);
 	arg->end_flag = ABORT;
-	sem_post(arg->end_flag_sem);
-	sem_post(arg->start_flag);
-	arg_pthreads_join(arg, idx);
+	sem_post(arg->end_flag_sem.sem);
+	sem_post(arg->start_flag.sem);
+	arg_waitpids(arg, idx);
+	if (arg->print_thrd_chk == TRUE)
+		pthread_join(arg->print_thrd, T_NULL);
+	if (arg->time_thrd_chk == TRUE)
+		pthread_join(arg->time_thrd, T_NULL);
 	philos_log_clear(arg, idx);
-	arg_mutexes_destroy(arg);
+	arg_sems_destroy(arg);
 	arg_free(arg);
 	return (err_msg(arg, msg, 1));
 }

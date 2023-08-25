@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   print_thread_func2_bonus.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 17:42:48 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:53:39 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 13:34:16 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,12 @@ static void	log_collect(t_arg *arg, t_dll *total_logs,
 	while (++idx < arg->philo_num)
 	{
 		temp_dll = &(arg->philo[idx].logs.head);
-		pthread_mutex_lock(&arg->log_mtx[idx]);
+		sem_wait_nointr(arg->log_sem[idx].sem);
 		while (temp_dll->back != &(arg->philo[idx].logs.tail)
 			&& ((t_log *)temp_dll->back->contents)->usec < usec - t_offset)
 			dll_node_move_to_another_dll_tail(temp_dll->back,
 				&arg->philo[idx].logs, total_logs);
-		pthread_mutex_unlock(&arg->log_mtx[idx]);
+		sem_post(arg->log_sem[idx].sem);
 	}
 }
 
@@ -129,8 +129,8 @@ static int	log_print_case_die(t_arg *arg, t_dll *total_logs,
 	printf("%ld %d died\n", temp_log->usec / 1000, temp_log->who);
 	dll_clear(total_logs, log_delete_func);
 	free(srt);
-	pthread_mutex_lock(&arg->end_flag_mtx);
+	sem_wait_nointr(arg->end_flag_sem.sem);
 	arg->end_flag = PHILO_DIE;
-	pthread_mutex_unlock(&arg->end_flag_mtx);
+	sem_post(arg->end_flag_sem.sem);
 	return (1);
 }

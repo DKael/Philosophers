@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 22:06:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:52:53 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 13:31:17 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ int	err_msg(t_arg *arg, const char *msg, int return_code)
 
 void	*thread_error_end(t_arg *arg)
 {
-	pthread_mutex_lock(&arg->end_flag_mtx);
+	sem_wait_nointr(arg->end_flag_sem.sem);
 	if (arg->end_flag == NORMAL)
 		arg->end_flag = ABORT;
-	pthread_mutex_unlock(&arg->end_flag_mtx);
+	sem_post(arg->end_flag_sem.sem);
 	return (T_NULL);
 }
 
@@ -34,8 +34,8 @@ int	check_end_flag(t_arg *arg)
 {
 	int	return_value;
 
-	pthread_mutex_lock(&arg->end_flag_mtx);
+	sem_wait_nointr(arg->end_flag_sem.sem);
 	return_value = arg->end_flag;
-	pthread_mutex_unlock(&arg->end_flag_mtx);
+	sem_post(arg->end_flag_sem.sem);
 	return (return_value);
 }

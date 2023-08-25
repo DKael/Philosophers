@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_report_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:10:17 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:53:13 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 13:32:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,9 @@ t_bool	report(t_philo *value, t_philo_status status, t_arg *arg)
 		+ (log->time.tv_usec - arg->start.tv_usec);
 	if (status == EATING)
 	{
-		pthread_mutex_lock(&arg->last_eat_mtx[value->idx]);
+		sem_wait_nointr(arg->last_eat_sem[value->idx].sem);
 		value->last_eat = log->usec;
-		pthread_mutex_unlock(&arg->last_eat_mtx[value->idx]);
+		sem_post(arg->last_eat_sem[value->idx].sem);
 	}
 	log->who = value->idx + 1;
 	log->status = status;
@@ -49,9 +49,9 @@ static t_bool	report2(t_philo *value, t_log *log, t_arg *arg)
 		free(log);
 		return (FALSE);
 	}
-	pthread_mutex_lock(&arg->log_mtx[value->idx]);
+	sem_wait_nointr(arg->log_sem[value->idx].sem);
 	dll_add_tail(&value->logs, log_node);
-	pthread_mutex_unlock(&arg->log_mtx[value->idx]);
+	sem_post(arg->log_sem[value->idx].sem);
 	return (TRUE);
 }
 
@@ -72,8 +72,8 @@ t_bool	die_report(t_arg *arg, long time_lapse_usec, int idx)
 		free(log);
 		return (FALSE);
 	}
-	pthread_mutex_lock(&arg->log_mtx[idx]);
+	sem_wait_nointr(arg->log_sem[idx].sem);
 	dll_add_tail(&arg->philo[idx].logs, log_node);
-	pthread_mutex_unlock(&arg->log_mtx[idx]);
+	sem_post(arg->log_sem[idx].sem);
 	return (TRUE);
 }

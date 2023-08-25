@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 15:14:21 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 11:07:26 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ static int	arg_init2(t_arg *arg, int argc, char **argv)
 	arg->start_flag_chk = FALSE;
 	arg->end_flag_sem_chk = FALSE;
 	arg->end_flag = NORMAL;
+	arg->print_thrd_chk = FALSE;
+	arg->time_thrd_chk = FALSE;
 	return (arg_init3(arg));
 }
 
@@ -70,14 +72,14 @@ static int	arg_init3(t_arg *arg)
 	arg->philo = (t_philo *)ft_calloc(arg->philo_num, sizeof(t_philo));
 	if (arg->philo == T_NULL)
 		return (err_msg(arg, "malloc error!", 1));
-	arg->last_eat_sem = (sem_t **)malloc(sizeof(sem_t *)
+	arg->last_eat_sem = (t_csem *)malloc(sizeof(t_csem)
 			* arg->philo_num);
 	if (arg->last_eat_sem == T_NULL)
 	{
 		arg_free(arg);
 		return (err_msg(arg, "malloc error!", 1));
 	}
-	arg->log_sem = (sem_t **)malloc(sizeof(sem_t *)
+	arg->log_sem = (t_csem *)malloc(sizeof(t_csem)
 			* arg->philo_num);
 	if (arg->log_sem == T_NULL)
 	{
@@ -87,11 +89,28 @@ static int	arg_init3(t_arg *arg)
 	return (0);
 }
 
-int	arg_sems_init(sem_t **lst, int num, int *sem_cnt)
+int	sems_open(t_csem *lst, int num, int *sem_cnt, const char *name)
 {
+	char	*number;
+	char	*name_temp;
+
 	*sem_cnt = -1;
 	while (++(*sem_cnt) < num)
-		if (sem_open(&lst[*sem_cnt], T_NULL) != 0)
+	{
+		number = ft_itoa(*sem_cnt);
+		if (number == T_NULL)
 			return (1);
+		name_temp = ft_strjoin(name, number);
+		if (name_temp == T_NULL)
+			return (1);
+		lst[*sem_cnt].name = name_temp;
+		free(number);
+		lst[*sem_cnt].sem = sem_open(lst[*sem_cnt].name, O_CREAT, 0644, 1);
+		if (lst[*sem_cnt].sem == SEM_FAILED)
+		{
+			free(name_temp);
+			return (1);
+		}
+	}
 	return (0);
 }

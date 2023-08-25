@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   print_thread_func1_bonus.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:53:33 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 13:33:00 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ void	*print_thread_func(void *input_arg)
 		time_offset = 1000;
 	else
 		time_offset = arg->philo_num * 5;
-	pthread_mutex_lock(&arg->start_flag);
-	pthread_mutex_unlock(&arg->start_flag);
+	sem_wait_nointr(arg->start_flag.sem);
+	sem_post(arg->start_flag.sem);
 	if (usleep(time_offset) == EINTR)
 		printf("Interrupted by a signa\n");
 	if (print_thread_func2(arg, time_offset) == 1)

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
+#    By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/08/23 09:52:25 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/08/25 13:52:04 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,7 +35,7 @@ CC = cc
 
 CFLAGS = -Wall -Wextra -Werror
 
-NAME = philo
+NAME = philo_bonus
 
 DATA_RACE_CHECK = 0
 

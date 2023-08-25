@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   time_thread_func_bonus.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:54:01 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 13:35:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ void	*time_thread_func(void *input_arg)
 	t_bool		time_thrd_end;
 
 	arg = (t_arg *)input_arg;
-	pthread_mutex_lock(&arg->start_flag);
-	pthread_mutex_unlock(&arg->start_flag);
+	sem_wait_nointr(arg->start_flag.sem);
+	sem_post(arg->start_flag.sem);
 	if (check_end_flag(arg) != NORMAL)
 		return (T_NULL);
 	time_thrd_end = FALSE;
@@ -48,10 +48,10 @@ static int	time_thread_func2(t_arg *arg,
 	idx = -1;
 	while (++idx < arg->philo_num)
 	{
-		pthread_mutex_lock(&arg->last_eat_mtx[idx]);
+		sem_wait_nointr(arg->last_eat_sem[idx].sem);
 		if (arg->philo[idx].end == TRUE)
 		{
-			pthread_mutex_unlock(&arg->last_eat_mtx[idx]);
+			sem_post(arg->last_eat_sem[idx].sem);
 			continue ;
 		}
 		if (time_lapse_usec > arg->philo[idx].last_eat + arg->d_time * MS_TO_US)
@@ -59,11 +59,11 @@ static int	time_thread_func2(t_arg *arg,
 			*time_thrd_end = TRUE;
 			if (die_report(arg, time_lapse_usec, idx) == FALSE)
 			{
-				pthread_mutex_unlock(&arg->last_eat_mtx[idx]);
+				sem_post(arg->last_eat_sem[idx].sem);
 				return (1);
 			}
 		}
-		pthread_mutex_unlock(&arg->last_eat_mtx[idx]);
+		sem_post(arg->last_eat_sem[idx].sem);
 	}
 	return (0);
 }

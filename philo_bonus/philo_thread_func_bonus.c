@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_thread_func_bonus.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 16:27:43 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/25 14:40:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,17 @@ static void		*philo_thread_func2_1(t_philo *value, t_arg *arg);
 static int		philo_thread_func2_2(t_philo *value, t_arg *arg);
 static int		philo_thread_func2_3(t_philo *value, t_arg *arg);
 
-void	*philo_thread_func(void *param)
+void	*philo_thread_func(t_arg *arg, t_philo *value)
 {
-	t_philo	*value;
-	t_arg	*arg;
-
-	value = (t_philo *)param;
-	arg = (t_arg *)value->arg;
-	value->eat_cnt = 0;
-	sem_wait_nointr(arg->start_flag);
-	sem_post(arg->start_flag);
+	sem_wait_nointr(arg->start_flag.sem);
+	sem_post(arg->start_flag.sem);
 	if (check_end_flag(arg) != NORMAL)
 		return (T_NULL);
-	pthread_mutex_lock(&arg->last_eat_mtx[value->idx]);
+	printf("%d test2\n", value->idx);
+	sem_wait_nointr(arg->last_eat_sem[value->idx].sem);
 	value->last_eat = 0;
-	pthread_mutex_unlock(&arg->last_eat_mtx[value->idx]);
+	sem_post(arg->last_eat_sem[value->idx].sem);
+	printf("%d test3\n", value->idx);
 	if (arg->philo_num == 1)
 	{
 		while (check_end_flag(arg) == 0)
@@ -49,12 +45,14 @@ static void	*philo_thread_func2_1(t_philo *value, t_arg *arg)
 
 	while (check_end_flag(arg) == NORMAL)
 	{
-		pthread_mutex_lock(value->first_fork);
-		pthread_mutex_lock(value->second_fork);
+		sem_wait_nointr(arg->fork.sem);
+		printf("%d philo get first fork\n", value->idx);
+		sem_wait_nointr(arg->fork.sem);
+		printf("%d philo get seconde fork\n", value->idx);
 		if (philo_thread_func2_2(value, arg) == 1)
 			return (thread_error_end(arg));
-		pthread_mutex_unlock(value->first_fork);
-		pthread_mutex_unlock(value->second_fork);
+		sem_post(arg->fork.sem);
+		sem_post(arg->fork.sem);
 		func_result = philo_thread_func2_3(value, arg);
 		if (func_result == 0)
 			return (T_NULL);
@@ -70,15 +68,15 @@ static int	philo_thread_func2_2(t_philo *value, t_arg *arg)
 		|| report(value, GET_FORK, arg) == FALSE
 		|| report(value, EATING, arg) == FALSE)
 	{
-		pthread_mutex_unlock(value->first_fork);
-		pthread_mutex_unlock(value->second_fork);
+		sem_post(arg->fork.sem);
+		sem_post(arg->fork.sem);
 		return (1);
 	}
 	if (check_end_flag(arg) != NORMAL
 		|| ft_usleep(arg->e_time * MS_TO_US) == FALSE)
 	{
-		pthread_mutex_unlock(value->first_fork);
-		pthread_mutex_unlock(value->second_fork);
+		sem_post(arg->fork.sem);
+		sem_post(arg->fork.sem);
 		return (1);
 	}
 	return (0);
@@ -88,9 +86,9 @@ static int	philo_thread_func2_3(t_philo *value, t_arg *arg)
 {
 	if (arg->have_to_eat != -1 && ++(value->eat_cnt) == arg->have_to_eat)
 	{
-		pthread_mutex_lock(&arg->last_eat_mtx[value->idx]);
+		sem_wait_nointr(arg->last_eat_sem[value->idx].sem);
 		value->end = TRUE;
-		pthread_mutex_unlock(&arg->last_eat_mtx[value->idx]);
+		sem_post(arg->last_eat_sem[value->idx].sem);
 		if (report(value, EAT_DONE, arg) == FALSE)
 			return (1);
 		return (0);
