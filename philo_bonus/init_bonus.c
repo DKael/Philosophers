@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 18:54:03 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:06:37 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
 
 static int	arg_init2(t_arg *arg, int argc, char **argv);
-static int	arg_init3(t_arg *arg);
 
 int	arg_init(t_arg *arg, int argc, char **argv)
 {
@@ -53,64 +52,12 @@ static int	arg_init2(t_arg *arg, int argc, char **argv)
 			return (err_msg(arg,
 					"Invalid input! Wrong range of input value.", 1));
 	}
-	arg->philo = T_NULL;
+	arg->pid_lst = (pid_t *)malloc(sizeof(pid_t) * arg->philo_num);
+	if (arg->pid_lst == T_NULL)
+		return (err_msg(arg, "malloc error!", 1));
 	arg->fork_chk = FALSE;
-	arg->last_eat_sem = T_NULL;
-	arg->last_eat_sem_cnt = -1;
-	arg->log_sem = T_NULL;
-	arg->log_sem_cnt = -1;
 	arg->start_flag_chk = FALSE;
-	arg->end_flag_sem_chk = FALSE;
-	arg->end_flag = NORMAL;
-	arg->print_thrd_chk = FALSE;
-	arg->time_thrd_chk = FALSE;
-	return (arg_init3(arg));
-}
-
-static int	arg_init3(t_arg *arg)
-{
-	arg->philo = (t_philo *)ft_calloc(arg->philo_num, sizeof(t_philo));
-	if (arg->philo == T_NULL)
-		return (err_msg(arg, "malloc error!", 1));
-	arg->last_eat_sem = (t_csem *)malloc(sizeof(t_csem)
-			* arg->philo_num);
-	if (arg->last_eat_sem == T_NULL)
-	{
-		arg_free(arg);
-		return (err_msg(arg, "malloc error!", 1));
-	}
-	arg->log_sem = (t_csem *)malloc(sizeof(t_csem)
-			* arg->philo_num);
-	if (arg->log_sem == T_NULL)
-	{
-		arg_free(arg);
-		return (err_msg(arg, "malloc error!", 1));
-	}
+	arg->print_sem_chk = FALSE;
 	return (0);
 }
 
-int	sems_open(t_csem *lst, int num, int *sem_cnt, const char *name)
-{
-	char	*number;
-	char	*name_temp;
-
-	*sem_cnt = -1;
-	while (++(*sem_cnt) < num)
-	{
-		number = ft_itoa(*sem_cnt);
-		if (number == T_NULL)
-			return (1);
-		name_temp = ft_strjoin(name, number);
-		if (name_temp == T_NULL)
-			return (1);
-		lst[*sem_cnt].name = name_temp;
-		free(number);
-		lst[*sem_cnt].sem = ft_sem_open(lst[*sem_cnt].name, 0644, 1);
-		if (lst[*sem_cnt].sem == SEM_FAILED)
-		{
-			free(name_temp);
-			return (1);
-		}
-	}
-	return (0);
-}

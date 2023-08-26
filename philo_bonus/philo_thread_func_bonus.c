@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_thread_func_bonus.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 19:04:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/26 21:32:20 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,39 +16,74 @@ static void		*philo_thread_func2_1(t_philo *value, t_arg *arg);
 static int		philo_thread_func2_2(t_philo *value, t_arg *arg);
 static int		philo_thread_func2_3(t_philo *value, t_arg *arg);
 
-void	*philo_thread_func(t_arg *arg, t_philo *value)
+void	philo_init(t_philo *data, int idx)
 {
+	data->idx = idx;
+	data->last_eat = 0;
+	data->last_eat_sem.name = T_NULL;
+	data->last_eat_sem_chk = FALSE;
+	data->end_flag = NORMAL;
+	data->end_flag_sem.name = T_NULL;
+	data->end_flag_sem_chk = FALSE;
+	data->end = FALSE;
+	data->eat_cnt = 0;
+	data->time_thrd_chk = FALSE;
+}
+
+void	philo_process_err(t_philo *data)
+{
+	free(data->last_eat_sem.name);
+	if (data->last_eat_sem_chk == TRUE)
+		ft_sem_destroy(&data->last_eat_sem);
+	free(data->end_flag_sem.name);
+	if (data->end_flag_sem_chk == TRUE)
+		ft_sem_destroy(&data->end_flag_sem);
+	if (data->time_thrd_chk = TRUE)
+		pthread_join(data->time_thrd, T_NULL);
+	exit(1);
+}
+
+void	philo_process_func(t_arg *arg, int idx)
+{
+	t_philo	data;
+	char	*temp;
+
+	philo_init(&data, idx);
+	temp = ft_itoa(idx);
+	if (temp == T_NULL)
+		return (1);
+	data.last_eat_sem.name = ft_strjoin("le_sem", temp);
+	data.end_flag_sem.name = ft_strjoin("e_flag", temp);
+	free(temp);
+	if (data.last_eat_sem.name == T_NULL || data.end_flag_sem.name == T_NULL)
+		return (philo_process_err(&data));
+	data.last_eat_sem.sem = ft_sem_open(data.last_eat_sem.name, 0644, 1);
+	if (data.last_eat_sem.sem == SEM_FAILED)
+		return (philo_process_err(&data));
+	data.last_eat_sem_chk = TRUE;
+	data.end_flag_sem.sem = ft_sem_open(data.last_eat_sem.name, 0644, 1);
+		if (data.end_flag_sem.sem == SEM_FAILED)
+		return (philo_process_err(&data));
+	data.end_flag_sem_chk = TRUE;
+	if (pthread_create(&data.time_thrd, T_NULL, time_thread_func, &data) != 0)
+		return (philo_process_err(&data));
+	data.time_thrd_chk = TRUE;
 	sem_wait_nointr(arg->start_flag.sem);
 	sem_post(arg->start_flag.sem);
-	if (check_end_flag(arg) != NORMAL)
-		return (T_NULL);
-	printf("%d test12, errno : %d\n", value->idx, errno);
-	sem_wait_nointr(arg->last_eat_sem[value->idx].sem);
-	value->last_eat = 0;
-	sem_post(arg->last_eat_sem[value->idx].sem);
-	printf("%d test13\n", value->idx);
-	if (arg->philo_num == 1)
-	{
-		while (check_end_flag(arg) == 0)
-			if (usleep(1000) == EINTR)
-				printf("Interrupted by a signa\n");
-		return (T_NULL);
-	}
-	if (value->idx % 2 == 0 && usleep(arg->philo_num * 10) != 0)
-		return (thread_error_end(arg));
+	
+	if (data.idx % 2 == 0 && usleep(arg->philo_num * 10) != 0)
+		return (philo_process_err(&data));
 	return (philo_thread_func2_1(value, arg));
 }
 
-static void	*philo_thread_func2_1(t_philo *value, t_arg *arg)
+static void	*philo_thread_func2_1(t_philo *data, t_arg *arg)
 {
 	int		func_result;
 
-	while (check_end_flag(arg) == NORMAL)
+	while (1)
 	{
 		sem_wait_nointr(arg->fork.sem);
-		printf("%d philo get first fork\n", value->idx);
 		sem_wait_nointr(arg->fork.sem);
-		printf("%d philo get seconde fork\n", value->idx);
 		if (philo_thread_func2_2(value, arg) == 1)
 			return (thread_error_end(arg));
 		sem_post(arg->fork.sem);

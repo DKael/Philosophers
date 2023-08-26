@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 11:12:56 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/26 08:12:32 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,10 +74,12 @@ static int	mutexes_init(t_arg *arg)
 		|| arg_mutexes_init(arg->last_eat_mtx,
 			arg->philo_num, &arg->last_eat_mtx_cnt) != 0
 		|| arg_mutexes_init(arg->log_mtx,
-			arg->philo_num, &arg->log_mtx_cnt) != 0
-		|| gettimeofday(&(arg->start), T_NULL) != 0)
+			arg->philo_num, &arg->log_mtx_cnt) != 0)
 		return (main_thread_end(arg, arg->philo_num + 2,
 				"pthread mutex init error!"));
+	if (gettimeofday(&(arg->start), T_NULL) != 0)
+		return (main_thread_end(arg, arg->philo_num + 2,
+				"gettimeofday error!"));
 	return (philosopher_end(arg));
 }
 

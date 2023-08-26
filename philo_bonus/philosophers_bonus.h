@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers_bonus.h                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 19:04:19 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/26 21:17:42 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,7 @@
 # include <semaphore.h>
 # include <signal.h>
 # include <sys/wait.h>
-# include "double_linked_list_bonus.h"
 # include "ft_errno_bonus.h"
-# include "quick_sort_bonus.h"
 
 
 #include "errno.h"
@@ -42,6 +40,8 @@
 # define S_TO_US 1000000
 # define MS_TO_US 1000
 
+# define FT_WIFEXITED(x) (((*(int *)&(x)) & 0177) == 0)
+
 typedef int				t_bool;
 
 typedef struct timeval	t_timeval;
@@ -53,6 +53,16 @@ typedef enum e_thread_status
 	PHILO_DIE,
 	END
 }	t_thread_status;
+
+typedef enum e_philo_status
+{
+	THINKING,
+	GET_FORK,
+	EATING,
+	SLEEPING,
+	DIE,
+	EAT_DONE
+}	t_philo_status;
 
 typedef	struct s_csem
 {
@@ -68,61 +78,36 @@ typedef struct s_arg
 	int				e_time;
 	int				s_time;
 	int				have_to_eat;
-	struct s_philo	*philo;
+	
 	t_csem			fork;
 	t_bool			fork_chk;
-	t_csem			*last_eat_sem;
-	int				last_eat_sem_cnt;
-	t_csem			*log_sem;
-	int				log_sem_cnt;
+	
+	
 	t_csem			start_flag;
 	t_bool			start_flag_chk;
-	t_csem			end_flag_sem;
-	t_bool			end_flag_sem_chk;
-	t_thread_status	end_flag;
-	pthread_t		print_thrd;
-	t_bool			print_thrd_chk;
-	pthread_t		time_thrd;
-	t_bool			time_thrd_chk;
+	t_csem			print_sem;
+	t_bool			print_sem_chk;
+	
+	pid_t	*pid_lst;
+	
 	t_timeval		start;
 	char			*program_name;
 }	t_arg;
 
 typedef struct s_philo
 {
-	pid_t			philo_pid;
 	int				idx;
 	long			last_eat;
+	t_csem			last_eat_sem;
+	t_bool			last_eat_sem_chk;
+	t_thread_status	end_flag;
+	t_csem			end_flag_sem;
+	t_bool			end_flag_sem_chk;
 	t_bool			end;
-	t_dll			logs;
-	t_arg			*arg;
 	int				eat_cnt;
+	pthread_t		time_thrd;
+	t_bool			time_thrd_chk;
 }	t_philo;
-
-typedef enum e_philo_status
-{
-	THINKING,
-	GET_FORK,
-	EATING,
-	SLEEPING,
-	DIE,
-	EAT_DONE
-}	t_philo_status;
-
-typedef struct s_log
-{
-	t_timeval		time;
-	long			usec;
-	int				who;
-	t_philo_status	status;
-}	t_log;
-
-typedef struct s_srt
-{
-	long			usec;
-	t_philo_status	status;
-	t_dllnode		*ptr;
-}	t_srt;
 
 // error.c
 int		err_msg(t_arg *arg, const char *msg, int return_code);
@@ -137,14 +122,11 @@ t_bool	die_report(t_arg *arg, long time_lapse_usec, int idx);
 // philo_thread_func.c
 // philo.c
 int		philosopher_start(int argc, char **argv);
-void	*philo_thread_func(t_arg *arg, t_philo *value);
-// print_thread_func.c
-void	*print_thread_func(void *input_arg);
+void	*philo_process_func(t_arg *arg, int idx);
+
 // resource_free_func.c
-int		arg_free(t_arg *data);
-void	log_delete_func(void *content);
-void	philos_log_clear(t_arg *arg, int cnt);
-void	arg_waitpids(t_arg *arg, int cnt);
+
+void	kill_and_waitpid(t_arg *arg, int cnt);
 void	arg_sems_destroy(t_arg *arg);
 // time_thread_func.c
 void	*time_thread_func(void *arg);
