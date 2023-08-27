@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/27 18:45:02 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 20:13:28 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	philo_process_func(t_arg *arg, int idx)
 	to_time_func.philo = &data;
 	if (pthread_create(&data.time_thrd, T_NULL,
 			time_thread_func, &to_time_func) != 0)
-		exit (1);
+		philo_process_end(arg);
 	sem_wait_nointr(arg->start_flag.sem);
 	if (sem_post(arg->start_flag.sem) != 0)
 		philo_process_end(arg);
@@ -75,10 +75,10 @@ void	philo_report(t_arg *arg, t_philo *data, t_philo_status status)
 {
 	long	time;
 
+	sem_wait_nointr(arg->print_sem.sem);
 	time = time_calc_from_start(arg);
 	if (time == -1)
-		philo_process_end(arg);
-	sem_wait_nointr(arg->print_sem.sem);
+		exit(1);
 	if (status == GET_FORK)
 		printf("%ld %d has taken a fork\n", time / 1000, data->idx + 1);
 	else if (status == EATING)
@@ -90,11 +90,6 @@ void	philo_report(t_arg *arg, t_philo *data, t_philo_status status)
 		printf("%ld %d is sleeping\n", time / 1000, data->idx + 1);
 	else if (status == THINKING)
 		printf("%ld %d is thinking\n", time / 1000, data->idx + 1);
-	else if (status == DIE)
-	{
-		printf("%ld %d died\n", time / 1000, data->idx + 1);
-		exit(1);
-	}
 	if (sem_post(arg->print_sem.sem) != 0)
-		philo_process_end(arg);
+		exit(1);
 }
