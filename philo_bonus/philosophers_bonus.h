@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/27 16:17:28 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 18:45:03 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ typedef enum e_philo_status
 	EATING,
 	SLEEPING,
 	DIE,
-	EAT_DONE
 }	t_philo_status;
 
 typedef struct s_csem
@@ -82,7 +81,6 @@ typedef struct s_philo
 	long			last_eat;
 	int				eat_cnt;
 	pthread_t		time_thrd;
-	t_bool			time_thrd_chk;
 }	t_philo;
 
 typedef struct s_arg_and_philo
@@ -104,6 +102,7 @@ int		arg_init(t_arg *data, int argc, char **argv);
 int		philosopher_start(int argc, char **argv);
 // philo_process_bonus.c
 void	philo_process_func(t_arg *arg, int idx);
+void	philo_process_end(t_arg *arg);
 void	philo_report(t_arg *arg, t_philo *data, t_philo_status status);
 // philo_time_thread_func_bonus.c
 void	*time_thread_func(void *arg);
@@ -119,7 +118,7 @@ t_bool	ft_usleep(long us);
 char	*ft_strjoin(char const *s1, char const *s2);
 //util2_bonus.c
 char	*ft_itoa(int n);
-long	time_calc(t_arg *arg);
+long	time_calc_from_start(t_arg *arg);
 size_t	ft_strlen(const char *s);
 
 #endif

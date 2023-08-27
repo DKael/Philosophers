@@ -6,15 +6,16 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/27 16:15:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 18:43:28 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
 
-static int		make_philo_process(t_arg *arg);
-static int		philosopher_end(t_arg *arg);
-static int		main_process_err(t_arg *arg, int idx, const char *msg);
+static int	make_philo_process(t_arg *arg);
+static int	philosopher_end(t_arg *arg);
+static int	main_process_err(t_arg *arg, int idx, const char *msg);
+static int	ft_wifexited(int status);
 
 int	philosopher_start(int argc, char **argv)
 {
@@ -68,15 +69,16 @@ static int	philosopher_end(t_arg *arg)
 	int	idx1;
 	int	status;
 
-	sem_post(arg->start_flag.sem);
+	if (sem_post(arg->start_flag.sem) != 0)
+		return (main_process_err(arg, arg->philo_num, "sem_post error!"));
 	idx = -1;
 	while (++idx < arg->philo_num)
 	{
 		waitpid(-1, &status, 0);
-		if (WIFEXITED(status) != 0)
+		if (ft_wifexited(status) != 0)
 			break ;
 	}
-	if (WIFEXITED(status) != 0)
+	if (ft_wifexited(status) != 0)
 	{
 		idx1 = -1;
 		while (++idx1 < arg->philo_num)
@@ -95,4 +97,9 @@ static int	main_process_err(t_arg *arg, int idx, const char *msg)
 	arg_sems_destroy(arg);
 	arg_heap_free(arg);
 	return (err_msg(arg, msg, 1));
+}
+
+static int	ft_wifexited(int status)
+{
+	return (((*(int *)&(status)) & 0177) == 0);
 }

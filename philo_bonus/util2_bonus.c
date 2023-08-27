@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/27 16:08:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/27 16:17:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 18:27:39 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,13 +88,13 @@ size_t	ft_strlen(const char *s)
 	return (index);
 }
 
-long	time_calc(t_arg *arg)
+long	time_calc_from_start(t_arg *arg)
 {
 	t_timeval	time_lapse;
 	long		result;
 
 	if (gettimeofday(&time_lapse, T_NULL) != 0)
-		exit(1);
+		return (-1);
 	result = (time_lapse.tv_sec - arg->start.tv_sec) * S_TO_US
 		+ (time_lapse.tv_usec - arg->start.tv_usec);
 	return (result);
