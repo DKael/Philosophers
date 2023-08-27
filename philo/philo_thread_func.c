@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:17:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 14:21:10 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,7 @@ void	*philo_thread_func(void *param)
 	if (arg->philo_num == 1)
 	{
 		while (check_end_flag(arg) == 0)
-			if (usleep(1000) == EINTR)
-				printf("Interrupted by a signa\n");
+			usleep(1000);
 		return (T_NULL);
 	}
 	if (value->idx % 2 == 0 && usleep(arg->philo_num * 10) != 0)
@@ -104,7 +103,7 @@ static int	philo_thread_func2_3(t_philo *value, t_arg *arg)
 	if (check_end_flag(arg) != NORMAL
 		|| report(value, THINKING, arg) == FALSE)
 		return (1);
-	if (arg->philo_num % 2 == 1 && usleep(arg->philo_num * 5) == EINTR)
-		printf("Interrupted by a signa\n");
+	if (arg->philo_num % 2 == 1)
+		usleep(arg->philo_num * 5);
 	return (2);
 }

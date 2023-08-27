@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   util_bonus.c                                       :+:      :+:    :+:   */
+/*   util1_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:12:58 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/25 13:39:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 16:08:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,85 +132,4 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	result[s1_size + index] = '\0';
 	return (result);
-}
-
-static char	*case_zero(void);
-static char	*case_pos(int n, int digit);
-static char	*case_neg(int n, int digit);
-
-char	*ft_itoa(int n)
-{
-	int		digit;
-	int		temp_n;
-
-	temp_n = n;
-	digit = 0;
-	while (temp_n != 0)
-	{
-		digit++;
-		temp_n /= 10;
-	}
-	if (n == 0)
-		return (case_zero());
-	else if (n > 0)
-		return (case_pos(n, digit));
-	else
-		return (case_neg(n, digit));
-}
-
-static char	*case_zero(void)
-{
-	char	*result;
-
-	result = (char *)malloc(sizeof(char) * 2);
-	if (result == NULL)
-		return (NULL);
-	result[0] = '0';
-	result[1] = '\0';
-	return (result);
-}
-
-static char	*case_pos(int n, int digit)
-{
-	char	*result;
-
-	result = (char *)malloc(sizeof(char) * (digit + 1));
-	if (result == NULL)
-		return (NULL);
-	result[digit--] = '\0';
-	while (n != 0)
-	{
-		result[digit--] = (n % 10) + '0';
-		n /= 10;
-	}
-	return (result);
-}
-
-static char	*case_neg(int n, int digit)
-{
-	char	*result;
-
-	result = (char *)malloc(sizeof(char) * (digit + 2));
-	if (result == NULL)
-		return (NULL);
-	result[0] = '-';
-	result[digit + 1] = '\0';
-	while (n != 0)
-	{
-		result[digit--] = (-1) * (n % 10) + '0';
-		n /= 10;
-	}
-	return (result);
-}
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	index;
-
-	index = 0;
-	while (s[index] != '\0')
-	{
-		index++;
-	}
-	return (index);
 }

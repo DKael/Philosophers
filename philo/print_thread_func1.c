@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 03:01:43 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 14:19:44 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,7 @@ void	*print_thread_func(void *input_arg)
 		time_offset = arg->philo_num * 5;
 	pthread_mutex_lock(&arg->start_flag);
 	pthread_mutex_unlock(&arg->start_flag);
-	if (usleep(time_offset) == EINTR)
-		printf("Interrupted by a signa\n");
+	usleep(time_offset);
 	if (print_thread_func2(arg, time_offset) == 1)
 		return (thread_error_end(arg));
 	return (T_NULL);

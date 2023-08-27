@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/08/23 09:25:41 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/08/27 16:20:28 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,9 +16,9 @@ SRCS =	main.c \
 		double_linked_list3.c \
 		error.c \
 		init.c \
+		main_thread.c \
 		philo_report.c \
 		philo_thread_func.c \
-		philo.c \
 		print_thread_func1.c \
 		print_thread_func2.c \
 		quick_sort.c \

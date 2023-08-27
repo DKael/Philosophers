@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   util1.c                                            :+:      :+:    :+:   */
+/*   util.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:12:58 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 22:33:13 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 14:20:21 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,7 @@ t_bool	ft_usleep(long us)
 			sleep_time /= 5;
 		else
 			sleep_time = 10;
-		if (usleep(sleep_time) != 0)
-			printf("usleep function is interrupted by a signal\n");
+		usleep(sleep_time);
 		if (gettimeofday(&t, T_NULL) != 0)
 			return (FALSE);
 		time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US

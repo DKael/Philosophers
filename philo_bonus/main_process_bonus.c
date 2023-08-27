@@ -1,48 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_bonus.c                                      :+:      :+:    :+:   */
+/*   main_process_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/26 21:20:45 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 16:15:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
 
-static int	make_philo_process(t_arg *arg);
-static int	philosopher_end(t_arg *arg);
-static int	main_process_err(t_arg *arg, int idx, const char *msg);
-
-void	sem_wait_nointr(sem_t *sem)
-{
-	int	result;
-
-	result = sem_wait(sem);
-	while (result == -1)
-		result = sem_wait(sem);
-}
-
-void	ft_sem_destroy(t_csem *csem)
-{
-	sem_close(csem->sem);
-	sem_unlink(csem->name);
-}
-
-sem_t	*ft_sem_open(const char *name, mode_t mode, unsigned int value)
-{
-	sem_t	*temp;
-
-	temp = sem_open(name, O_EXCL | O_CREAT, mode, value);
-	if (temp == SEM_FAILED)
-	{
-		sem_unlink(name);
-		temp = sem_open(name, O_EXCL | O_CREAT, mode, value);
-	}
-	return (temp);		
-}
+static int		make_philo_process(t_arg *arg);
+static int		philosopher_end(t_arg *arg);
+static int		main_process_err(t_arg *arg, int idx, const char *msg);
 
 int	philosopher_start(int argc, char **argv)
 {
@@ -65,6 +37,9 @@ int	philosopher_start(int argc, char **argv)
 	if (arg.fork.sem == SEM_FAILED)
 		return (main_process_err(&arg, 0, "sem open failed!"));
 	arg.print_sem_chk = TRUE;
+	if (make_multiple_sem(arg.last_eat_sem, "last_eat_sem",
+			&arg.last_eat_sem_cnt, arg.philo_num) == 1)
+		return (main_process_err(&arg, 0, "sem open failed!"));
 	return (make_philo_process(&arg));
 }
 
@@ -74,15 +49,15 @@ static int	make_philo_process(t_arg *arg)
 
 	sem_wait_nointr(arg->start_flag.sem);
 	if (gettimeofday(&(arg->start), T_NULL) != 0)
-		return (main_process_end(arg, 0, "gettimeofday failed!"));
+		return (main_process_err(arg, 0, "gettimeofday failed!"));
 	idx = -1;
 	while (++idx < arg->philo_num)
 	{
 		arg->pid_lst[idx] = fork();
 		if (arg->pid_lst[idx] == -1)
-			return (main_process_end(arg, idx, "fork() error!"));
+			return (main_process_err(arg, idx, "fork() error!"));
 		else if (arg->pid_lst[idx] == 0)
-			return (philo_process_func(arg, idx));
+			philo_process_func(arg, idx);
 	}
 	return (philosopher_end(arg));
 }
@@ -98,14 +73,14 @@ static int	philosopher_end(t_arg *arg)
 	while (++idx < arg->philo_num)
 	{
 		waitpid(-1, &status, 0);
-		if (FT_WIFEXITED(status) != TRUE)
-			break;
+		if (WIFEXITED(status) != 0)
+			break ;
 	}
-	if (FT_WIFEXITED(status) != TRUE)
+	if (WIFEXITED(status) != 0)
 	{
 		idx1 = -1;
-		while (++idx < arg->philo_num)
-			kill(arg->pid_lst[idx] ,SIGKILL);
+		while (++idx1 < arg->philo_num)
+			kill(arg->pid_lst[idx1], SIGKILL);
 		while (++idx < arg->philo_num)
 			waitpid(-1, T_NULL, 0);
 	}
@@ -118,6 +93,6 @@ static int	main_process_err(t_arg *arg, int idx, const char *msg)
 {
 	kill_and_waitpid(arg, idx);
 	arg_sems_destroy(arg);
-	free(arg->pid_lst);
+	arg_heap_free(arg);
 	return (err_msg(arg, msg, 1));
 }

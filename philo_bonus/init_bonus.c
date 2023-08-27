@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/26 17:06:37 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/27 14:25:09 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,20 @@ static int	arg_init2(t_arg *arg, int argc, char **argv)
 			return (err_msg(arg,
 					"Invalid input! Wrong range of input value.", 1));
 	}
-	arg->pid_lst = (pid_t *)malloc(sizeof(pid_t) * arg->philo_num);
-	if (arg->pid_lst == T_NULL)
-		return (err_msg(arg, "malloc error!", 1));
 	arg->fork_chk = FALSE;
 	arg->start_flag_chk = FALSE;
 	arg->print_sem_chk = FALSE;
+	arg->last_eat_sem = T_NULL;
+	arg->last_eat_sem_cnt = -1;
+	arg->pid_lst = T_NULL;
+	arg->last_eat_sem = (t_csem *)malloc(sizeof(t_csem) * arg->philo_num);
+	if (arg->last_eat_sem == T_NULL)
+		return (err_msg(arg, "malloc error!", 1));
+	arg->pid_lst = (pid_t *)malloc(sizeof(pid_t) * arg->philo_num);
+	if (arg->pid_lst == T_NULL)
+	{
+		arg_heap_free(arg);
+		return (err_msg(arg, "malloc error!", 1));
+	}
 	return (0);
 }
-

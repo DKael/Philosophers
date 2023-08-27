@@ -3,29 +3,23 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+         #
+#    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/08/25 13:52:04 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/08/27 16:20:00 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS =	main_bonus.c \
-		double_linked_list1_bonus.c \
-		double_linked_list2_bonus.c \
-		double_linked_list3_bonus.c \
+		custom_sem_func_bonus.c \
 		error_bonus.c \
 		init_bonus.c \
-		philo_report_bonus.c \
-		philo_thread_func_bonus.c \
-		philo_bonus.c \
-		print_thread_func1_bonus.c \
-		print_thread_func2_bonus.c \
-		quick_sort_bonus.c \
+		main_process_bonus.c \
+		philo_process_bonus.c \
+		philo_time_thread_func_bonus.c\
 		resource_free_func_bonus.c \
-		srt_func_bonus.c \
-		time_thread_func_bonus.c\
-		util_bonus.c \
+		util1_bonus.c \
+		util2_bonus.c \
 		
 OBJS = 	${SRCS:.c=.o}
 
