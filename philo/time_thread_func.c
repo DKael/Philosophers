@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:07:24 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/28 12:49:44 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static int	time_thread_func2(t_arg *arg,
 		if (time_lapse_usec > arg->philo[idx].last_eat + arg->d_time * MS_TO_US)
 		{
 			*time_thrd_end = TRUE;
-			if (die_report(arg, time_lapse_usec, idx) == FALSE)
+			if (report(&arg->philo[idx], DIE, arg) == FALSE)
 			{
 				pthread_mutex_unlock(&arg->last_eat_mtx[idx]);
 				return (1);

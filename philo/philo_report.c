@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:10:17 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:15:53 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/08/28 12:50:53 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,28 +52,5 @@ static t_bool	report2(t_philo *value, t_log *log, t_arg *arg)
 	pthread_mutex_lock(&arg->log_mtx[value->idx]);
 	dll_add_tail(&value->logs, log_node);
 	pthread_mutex_unlock(&arg->log_mtx[value->idx]);
-	return (TRUE);
-}
-
-t_bool	die_report(t_arg *arg, long time_lapse_usec, int idx)
-{
-	t_log		*log;
-	t_dllnode	*log_node;
-
-	log = (t_log *)malloc(sizeof(t_log));
-	if (log == T_NULL)
-		return (FALSE);
-	log->usec = time_lapse_usec;
-	log->who = idx + 1;
-	log->status = DIE;
-	log_node = dll_new_node((void *)log);
-	if (log_node == T_NULL)
-	{
-		free(log);
-		return (FALSE);
-	}
-	pthread_mutex_lock(&arg->log_mtx[idx]);
-	dll_add_tail(&arg->philo[idx].logs, log_node);
-	pthread_mutex_unlock(&arg->log_mtx[idx]);
 	return (TRUE);
 }
