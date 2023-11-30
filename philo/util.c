@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:12:58 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/27 14:20:21 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/11/30 18:47:54 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	*ft_calloc(size_t count, size_t size)
 	return (result);
 }
 
-t_bool	ft_usleep(long us)
+t_bool	ft_usleep(long us, t_arg *arg)
 {
 	t_timeval	start;
 	t_timeval	t;
@@ -90,6 +90,8 @@ t_bool	ft_usleep(long us)
 	time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US
 		+ (t.tv_usec - start.tv_usec);
 	sleep_time = us;
+	if (sleep_time > 5000000)
+		sleep_time = 5000000;
 	while (time_lapse < us)
 	{
 		if (sleep_time >= 20)
@@ -97,7 +99,7 @@ t_bool	ft_usleep(long us)
 		else
 			sleep_time = 10;
 		usleep(sleep_time);
-		if (gettimeofday(&t, T_NULL) != 0)
+		if (check_end_flag(arg) != NORMAL || gettimeofday(&t, T_NULL) != 0)
 			return (FALSE);
 		time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US
 			+ (t.tv_usec - start.tv_usec);

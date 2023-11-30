@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/28 12:51:15 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/11/30 18:47:20 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,6 @@ void	*time_thread_func(void *arg);
 int		ft_atoi_int(const char *str);
 t_bool	ft_isdecimal(char *str);
 void	*ft_calloc(size_t count, size_t size);
-t_bool	ft_usleep(long us);
+t_bool	ft_usleep(long us, t_arg *arg);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/27 14:21:10 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/11/30 18:47:05 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,6 @@ static void	*philo_thread_func2_1(t_philo *value, t_arg *arg)
 
 	while (check_end_flag(arg) == NORMAL)
 	{
-		pthread_mutex_lock(value->first_fork);
-		pthread_mutex_lock(value->second_fork);
 		if (philo_thread_func2_2(value, arg) == 1)
 			return (thread_error_end(arg));
 		pthread_mutex_unlock(value->first_fork);
@@ -65,6 +63,14 @@ static void	*philo_thread_func2_1(t_philo *value, t_arg *arg)
 
 static int	philo_thread_func2_2(t_philo *value, t_arg *arg)
 {
+	pthread_mutex_lock(value->first_fork);
+	if (check_end_flag(arg) != NORMAL
+		|| report(value, GET_FORK, arg) == FALSE)
+	{
+		pthread_mutex_unlock(value->first_fork);
+		return (1);
+	}
+	pthread_mutex_lock(value->second_fork);
 	if (check_end_flag(arg) != NORMAL
 		|| report(value, GET_FORK, arg) == FALSE
 		|| report(value, EATING, arg) == FALSE)
@@ -74,7 +80,7 @@ static int	philo_thread_func2_2(t_philo *value, t_arg *arg)
 		return (1);
 	}
 	if (check_end_flag(arg) != NORMAL
-		|| ft_usleep(arg->e_time * MS_TO_US) == FALSE)
+		|| ft_usleep(arg->e_time * MS_TO_US, arg) == FALSE)
 	{
 		pthread_mutex_unlock(value->first_fork);
 		pthread_mutex_unlock(value->second_fork);
@@ -98,7 +104,7 @@ static int	philo_thread_func2_3(t_philo *value, t_arg *arg)
 		|| report(value, SLEEPING, arg) == FALSE)
 		return (1);
 	if (check_end_flag(arg) != NORMAL
-		|| ft_usleep(arg->s_time * MS_TO_US) == FALSE)
+		|| ft_usleep(arg->s_time * MS_TO_US, arg) == FALSE)
 		return (1);
 	if (check_end_flag(arg) != NORMAL
 		|| report(value, THINKING, arg) == FALSE)
