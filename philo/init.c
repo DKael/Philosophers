@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 16:18:04 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 14:41:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2024/01/27 16:51:41 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@ int	arg_init(t_arg *arg, int argc, char **argv)
 			return (err_msg(arg, "Invalid input! Input must be number.", 1));
 		if (argv[idx][0] == '-')
 			return (err_msg(arg, "Invalid input! Input must be positive.", 1));
+		if ((argv[idx][0] == '+' && argv[idx][1] == '0')
+			|| argv[idx][0] == '0')
+			return (err_msg(arg,
+					"Invalid input! Input must not start with 0.", 1));
 	}
 	arg->philo_num = ft_atoi_int(argv[1]);
 	if (arg->philo_num == 0 && argv[1][0] != '0')
@@ -37,14 +41,14 @@ int	arg_init(t_arg *arg, int argc, char **argv)
 	arg->e_time = ft_atoi_int(argv[3]);
 	if (arg->e_time == 0 && argv[3][0] != '0')
 		return (err_msg(arg, "Invalid input! Wrong range of input value.", 1));
-	arg->s_time = ft_atoi_int(argv[4]);
-	if (arg->s_time == 0 && argv[4][0] != '0')
-		return (err_msg(arg, "Invalid input! Wrong range of input value.", 1));
 	return (arg_init2(arg, argc, argv));
 }
 
-static int	arg_init2(t_arg *arg, int argc, char **argv)
+inline static int	arg_init2(t_arg *arg, int argc, char **argv)
 {
+	arg->s_time = ft_atoi_int(argv[4]);
+	if (arg->s_time == 0 && argv[4][0] != '0')
+		return (err_msg(arg, "Invalid input! Wrong range of input value.", 1));
 	arg->have_to_eat = -1;
 	if (argc == 6)
 	{
@@ -66,28 +70,14 @@ static int	arg_init2(t_arg *arg, int argc, char **argv)
 	return (arg_init3(arg));
 }
 
-static int	arg_init3(t_arg *arg)
+inline static int	arg_init3(t_arg *arg)
 {
 	arg->philo = (t_philo *)ft_calloc(arg->philo_num + 2, sizeof(t_philo));
-	if (arg->philo == T_NULL)
-		return (err_msg(arg, "malloc error!", 1));
-	arg->fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
-			* arg->philo_num);
-	if (arg->fork == T_NULL)
-	{
-		arg_free(arg);
-		return (err_msg(arg, "malloc error!", 1));
-	}
-	arg->last_eat_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
-			* arg->philo_num);
-	if (arg->last_eat_mtx == T_NULL)
-	{
-		arg_free(arg);
-		return (err_msg(arg, "malloc error!", 1));
-	}
-	arg->log_mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
-			* arg->philo_num);
-	if (arg->log_mtx == T_NULL)
+	arg->fork = (t_fork *)malloc(sizeof(t_fork) * arg->philo_num);
+	arg->last_eat_mtx = (t_mtx *)malloc(sizeof(t_mtx) * arg->philo_num);
+	arg->log_mtx = (t_mtx *)malloc(sizeof(t_mtx) * arg->philo_num);
+	if (arg->philo == T_NULL || arg->fork == T_NULL
+		|| arg->last_eat_mtx == T_NULL || arg->log_mtx == T_NULL)
 	{
 		arg_free(arg);
 		return (err_msg(arg, "malloc error!", 1));
@@ -95,7 +85,7 @@ static int	arg_init3(t_arg *arg)
 	return (0);
 }
 
-int	arg_mutexes_init(pthread_mutex_t *lst, int num, int *mtx_cnt)
+int	mtxs_init(t_mtx *lst, int num, int *mtx_cnt)
 {
 	*mtx_cnt = -1;
 	while (++(*mtx_cnt) < num)

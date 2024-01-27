@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:17:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/27 15:52:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2024/01/27 17:56:18 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	philosopher_start(int argc, char **argv)
 	return (make_thread(&arg));
 }
 
-static int	make_thread(t_arg *arg)
+inline static int	make_thread(t_arg *arg)
 {
 	int	idx;
 
@@ -48,11 +48,12 @@ static int	make_thread(t_arg *arg)
 	while (++idx < arg->philo_num)
 	{
 		arg->philo[idx].idx = idx;
-		arg->philo[idx].first_fork = &(arg->fork[idx]);
-		arg->philo[idx].second_fork = &(arg->fork[(idx + 1) % arg->philo_num]);
+		arg->philo[idx].fork[0] = &(arg->fork[idx]);
+		arg->philo[idx].fork[1] = &(arg->fork[(idx + 1) % arg->philo_num]);
 		dll_init(&(arg->philo[idx].logs));
 		arg->philo[idx].arg = arg;
 		arg->philo[idx].end = FALSE;
+		arg->philo[idx].last_eat = 0;
 		if (pthread_create(&(arg->philo[idx].thrd), T_NULL,
 				philo_thread_func, &(arg->philo[idx])) != 0)
 			return (main_thread_end(arg, idx, "pthread create error!"));
@@ -68,12 +69,19 @@ static int	make_thread(t_arg *arg)
 	return (mutexes_init(arg));
 }
 
-static int	mutexes_init(t_arg *arg)
+inline static int	mutexes_init(t_arg *arg)
 {
-	if (arg_mutexes_init(arg->fork, arg->philo_num, &arg->fork_cnt) != 0
-		|| arg_mutexes_init(arg->last_eat_mtx,
+	while (++(arg->fork_cnt) < arg->philo_num)
+	{
+		arg->fork[arg->fork_cnt].status = UNUSE;
+		if (pthread_mutex_init(&arg->fork[arg->fork_cnt].mtx,
+				T_NULL) != 0)
+			return (main_thread_end(arg, arg->philo_num + 2,
+					"pthread mutex init error!"));
+	}
+	if (mtxs_init(arg->last_eat_mtx,
 			arg->philo_num, &arg->last_eat_mtx_cnt) != 0
-		|| arg_mutexes_init(arg->log_mtx,
+		|| mtxs_init(arg->log_mtx,
 			arg->philo_num, &arg->log_mtx_cnt) != 0)
 		return (main_thread_end(arg, arg->philo_num + 2,
 				"pthread mutex init error!"));
@@ -83,7 +91,7 @@ static int	mutexes_init(t_arg *arg)
 	return (philosopher_end(arg));
 }
 
-static int	philosopher_end(t_arg *arg)
+inline static int	philosopher_end(t_arg *arg)
 {
 	int	idx;
 
@@ -91,7 +99,7 @@ static int	philosopher_end(t_arg *arg)
 	idx = -1;
 	while (++idx < arg->philo_num)
 		pthread_join(arg->philo[idx].thrd, T_NULL);
-	if (check_end_flag(arg) == NORMAL)
+	if (chk_end(arg) == NORMAL)
 	{
 		pthread_mutex_lock(&arg->end_flag_mtx);
 		arg->end_flag = END;

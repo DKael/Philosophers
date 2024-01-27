@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:33:08 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 22:33:07 by hyungdki         ###   ########.fr       */
+/*   Updated: 2024/01/27 16:21:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	arg_mutexes_destroy(t_arg *arg)
 		pthread_mutex_destroy(&arg->end_flag_mtx);
 	idx = -1;
 	while (++idx < arg->fork_cnt)
-		pthread_mutex_destroy(&arg->fork[idx]);
+		pthread_mutex_destroy(&arg->fork[idx].mtx);
 	idx = -1;
 	while (++idx < arg->last_eat_mtx_cnt)
 		pthread_mutex_destroy(&arg->last_eat_mtx[idx]);

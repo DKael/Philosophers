@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 15:01:17 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 22:33:05 by hyungdki         ###   ########.fr       */
+/*   Updated: 2024/01/27 16:53:11 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	sorting(void *lst, int size,
 	quick_sort(data);
 }
 
-void	quick_sort(t_data data)
+static void	quick_sort(t_data data)
 {
 	int		pivot;
 	t_data	left_data;
@@ -47,7 +47,7 @@ void	quick_sort(t_data data)
 	}
 }
 
-int	make_partition(const t_data *data)
+static int	make_partition(const t_data *data)
 {
 	int	pivot;
 	int	head;

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 19:25:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/11/30 18:47:20 by hyungdki         ###   ########.fr       */
+/*   Updated: 2024/01/27 18:12:38 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,48 +39,19 @@ typedef int				t_bool;
 
 typedef struct timeval	t_timeval;
 
-typedef enum e_thread_status
-{
-	NORMAL,
-	ABORT,
-	PHILO_DIE,
-	END
-}	t_thread_status;
-typedef struct s_arg
-{
-	int				philo_num;
-	int				d_time;
-	int				e_time;
-	int				s_time;
-	int				have_to_eat;
-	struct s_philo	*philo;
-	pthread_mutex_t	*fork;
-	int				fork_cnt;
-	pthread_mutex_t	*last_eat_mtx;
-	int				last_eat_mtx_cnt;
-	pthread_mutex_t	*log_mtx;
-	int				log_mtx_cnt;
-	pthread_mutex_t	start_flag;
-	t_bool			start_flag_chk;
-	pthread_mutex_t	end_flag_mtx;
-	t_bool			end_flag_mtx_chk;
-	t_thread_status	end_flag;
-	t_timeval		start;
-	char			*program_name;
-}	t_arg;
+typedef pthread_mutex_t	t_mtx;
 
-typedef struct s_philo
+typedef enum e_fork_status
 {
-	int				idx;
-	pthread_mutex_t	*first_fork;
-	pthread_mutex_t	*second_fork;
-	long			last_eat;
-	t_bool			end;
-	pthread_t		thrd;
-	t_dll			logs;
-	t_arg			*arg;
-	int				eat_cnt;
-}	t_philo;
+	UNUSE,
+	USING
+}	t_fort_status;
+
+typedef enum e_hand
+{
+	LEFT,
+	RIGHT
+}	t_hand;
 
 typedef enum e_philo_status
 {
@@ -91,6 +62,55 @@ typedef enum e_philo_status
 	DIE,
 	EAT_DONE
 }	t_philo_status;
+
+typedef enum e_thread_status
+{
+	NORMAL,
+	ABORT,
+	PHILO_DIE,
+	END
+}	t_thread_status;
+
+typedef struct s_fork
+{
+	t_fort_status	status;
+	t_mtx			mtx;
+}	t_fork;
+
+typedef struct s_arg
+{
+	int				philo_num;
+	int				d_time;
+	int				e_time;
+	int				s_time;
+	int				have_to_eat;
+	struct s_philo	*philo;
+	t_fork			*fork;
+	int				fork_cnt;
+	t_mtx			*last_eat_mtx;
+	int				last_eat_mtx_cnt;
+	t_mtx			*log_mtx;
+	int				log_mtx_cnt;
+	t_mtx			start_flag;
+	t_bool			start_flag_chk;
+	t_mtx			end_flag_mtx;
+	t_bool			end_flag_mtx_chk;
+	t_thread_status	end_flag;
+	t_timeval		start;
+	char			*program_name;
+}	t_arg;
+
+typedef struct s_philo
+{
+	int			idx;
+	t_fork		*fork[2];
+	long		last_eat;
+	t_bool		end;
+	pthread_t	thrd;
+	t_dll		logs;
+	t_arg		*arg;
+	int			eat_cnt;
+}	t_philo;
 
 typedef struct s_log
 {
@@ -110,10 +130,10 @@ typedef struct s_srt
 // error.c
 int		err_msg(t_arg *arg, const char *msg, int return_code);
 void	*thread_error_end(t_arg *arg);
-int		check_end_flag(t_arg *arg);
+int		chk_end(t_arg *arg);
 // init.c
 int		arg_init(t_arg *data, int argc, char **argv);
-int		arg_mutexes_init(pthread_mutex_t *lst, int num, int *mtx_cnt);
+int		mtxs_init(t_mtx *lst, int num, int *mtx_cnt);
 // philo_report.c
 t_bool	report(t_philo *value, t_philo_status status, t_arg *arg);
 // main_thread.c
@@ -135,5 +155,6 @@ int		ft_atoi_int(const char *str);
 t_bool	ft_isdecimal(char *str);
 void	*ft_calloc(size_t count, size_t size);
 t_bool	ft_usleep(long us, t_arg *arg);
+long	time_calc(t_timeval t1, t_timeval t2);
 
 #endif

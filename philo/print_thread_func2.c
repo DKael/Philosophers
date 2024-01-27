@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 17:42:48 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/23 09:21:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2024/01/27 17:04:41 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	print_thread_func2(t_arg *arg, long time_offset)
 
 	dll_init(&total_logs);
 	eat_done_cnt = 0;
-	while (check_end_flag(arg) != ABORT && eat_done_cnt < arg->philo_num)
+	while (chk_end(arg) != ABORT && eat_done_cnt < arg->philo_num)
 	{
 		if (gettimeofday(&t_lapse, T_NULL) != 0)
 			return (1);
@@ -49,15 +49,14 @@ int	print_thread_func2(t_arg *arg, long time_offset)
 	return (0);
 }
 
-static void	log_collect(t_arg *arg, t_dll *total_logs,
+inline static void	log_collect(t_arg *arg, t_dll *total_logs,
 		long t_offset, t_timeval t_lapse)
 {
 	int			idx;
 	long		usec;
 	t_dllnode	*temp_dll;
 
-	usec = (t_lapse.tv_sec - arg->start.tv_sec)
-		* S_TO_US + (t_lapse.tv_usec - arg->start.tv_usec);
+	usec = time_calc(t_lapse, arg->start);
 	idx = -1;
 	while (++idx < arg->philo_num)
 	{
@@ -71,7 +70,7 @@ static void	log_collect(t_arg *arg, t_dll *total_logs,
 	}
 }
 
-static t_srt	*srt_log_sorting(t_dll *total_logs)
+inline static t_srt	*srt_log_sorting(t_dll *total_logs)
 {
 	t_srt		*srt;
 	int			idx;
@@ -96,7 +95,7 @@ static t_srt	*srt_log_sorting(t_dll *total_logs)
 	return (srt);
 }
 
-static int	log_print(t_arg *arg, t_dll *total_logs,
+inline static int	log_print(t_arg *arg, t_dll *total_logs,
 				t_srt *srt, int *eat_done_cnt)
 {
 	int		idx;
@@ -123,7 +122,7 @@ static int	log_print(t_arg *arg, t_dll *total_logs,
 	return (0);
 }
 
-static int	log_print_case_die(t_arg *arg, t_dll *total_logs,
+inline static int	log_print_case_die(t_arg *arg, t_dll *total_logs,
 		t_log *temp_log, t_srt *srt)
 {
 	printf("%ld %d died\n", temp_log->usec / 1000, temp_log->who);

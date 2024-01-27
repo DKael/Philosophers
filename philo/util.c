@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 16:12:58 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/11/30 18:47:54 by hyungdki         ###   ########.fr       */
+/*   Updated: 2024/01/27 17:06:04 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,13 +85,12 @@ t_bool	ft_usleep(long us, t_arg *arg)
 	long		time_lapse;
 	long		sleep_time;
 
-	if (gettimeofday(&start, T_NULL) != 0 || gettimeofday(&t, T_NULL) != 0)
-		return (FALSE);
-	time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US
-		+ (t.tv_usec - start.tv_usec);
 	sleep_time = us;
 	if (sleep_time > 5000000)
 		sleep_time = 5000000;
+	if (gettimeofday(&start, T_NULL) != 0)
+		return (FALSE);
+	time_lapse = 0;
 	while (time_lapse < us)
 	{
 		if (sleep_time >= 20)
@@ -99,10 +98,15 @@ t_bool	ft_usleep(long us, t_arg *arg)
 		else
 			sleep_time = 10;
 		usleep(sleep_time);
-		if (check_end_flag(arg) != NORMAL || gettimeofday(&t, T_NULL) != 0)
+		if (chk_end(arg) != NORMAL || gettimeofday(&t, T_NULL) != 0)
 			return (FALSE);
-		time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US
-			+ (t.tv_usec - start.tv_usec);
+		time_lapse = time_calc(t, start);
 	}
 	return (TRUE);
+}
+
+inline long	time_calc(t_timeval t1, t_timeval t2)
+{
+	return ((t1.tv_sec - t2.tv_sec) * S_TO_US
+		+ (t1.tv_usec - t2.tv_usec));
 }

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/30 22:06:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/22 22:32:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2024/01/27 16:51:10 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	*thread_error_end(t_arg *arg)
 	return (T_NULL);
 }
 
-int	check_end_flag(t_arg *arg)
+inline int	chk_end(t_arg *arg)
 {
 	int	return_value;
 
