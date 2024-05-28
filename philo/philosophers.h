@@ -21,7 +21,6 @@
 # include <sys/time.h>
 # include <limits.h>
 # include "double_linked_list.h"
-# include "ft_errno.h"
 # include "quick_sort.h"
 
 # if !defined(TRUE) && !defined(FALSE)

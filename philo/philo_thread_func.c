@@ -29,8 +29,16 @@ void	*philo_thread_func(void *param)
 	pthread_mutex_unlock(&arg->start_flag);
 	if (chk_end(arg) != NORMAL)
 		return (T_NULL);
-	if (val->idx % 2 == 0 && usleep(arg->philo_num * 5) != 0)
-		return (thread_error_end(arg));
+	if (arg->philo_num == 1)
+	{
+		if (report(val, GET_FORK, arg) == FALSE)
+			return (T_NULL);
+		while (chk_end(arg) == 0)
+			usleep(1000);
+		return (T_NULL);
+	}
+	if (val->idx % 2 == 0)
+		usleep(arg->philo_num * 5);
 	return (philo_act(val, arg));
 }
 

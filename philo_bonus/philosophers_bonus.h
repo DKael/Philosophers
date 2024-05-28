@@ -23,7 +23,6 @@
 # include <semaphore.h>
 # include <signal.h>
 # include <sys/wait.h>
-# include "ft_errno_bonus.h"
 
 # if !defined(TRUE) && !defined(FALSE)
 #  define TRUE 1
