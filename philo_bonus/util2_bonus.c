@@ -12,23 +12,17 @@
 
 #include "philosophers_bonus.h"
 
-static char	*case_pos(int n, int digit);
-static char	*case_neg(int n, int digit);
-
-char	*ft_itoa(int n)
+int	ft_itoa(int n, char *buf)
 {
 	int		digit;
 	int		temp_n;
-	char	*result;
+	int		digit_save;
 
 	if (n == 0)
 	{
-		result = (char *)malloc(sizeof(char) * 2);
-		if (result == T_NULL)
-			return (T_NULL);
-		result[0] = '0';
-		result[1] = '\0';
-		return (result);
+		buf[0] = '0';
+		buf[1] = '\0';
+		return (1);
 	}
 	temp_n = n;
 	digit = 0;
@@ -37,43 +31,32 @@ char	*ft_itoa(int n)
 		digit++;
 		temp_n /= 10;
 	}
-	if (n > 0)
-		return (case_pos(n, digit));
-	else
-		return (case_neg(n, digit));
-}
-
-static char	*case_pos(int n, int digit)
-{
-	char	*result;
-
-	result = (char *)malloc(sizeof(char) * (digit + 1));
-	if (result == NULL)
-		return (NULL);
-	result[digit--] = '\0';
+	digit_save = digit;
+	buf[digit--] = '\0';
 	while (n != 0)
 	{
-		result[digit--] = (n % 10) + '0';
+		buf[digit--] = (n % 10) + '0';
 		n /= 10;
 	}
-	return (result);
+	return (digit_save);
 }
 
-static char	*case_neg(int n, int digit)
+void	ft_strcat(char *dest, char *src)
 {
-	char	*result;
+	int	dest_index;
+	int	src_index;
 
-	result = (char *)malloc(sizeof(char) * (digit + 2));
-	if (result == NULL)
-		return (NULL);
-	result[0] = '-';
-	result[digit + 1] = '\0';
-	while (n != 0)
+	dest_index = 0;
+	src_index = 0;
+	while (dest[dest_index] != '\0')
+		dest_index++;
+	while (src[src_index] != '\0')
 	{
-		result[digit--] = (-1) * (n % 10) + '0';
-		n /= 10;
+		dest[dest_index] = src[src_index];
+		dest_index++;
+		src_index++;
 	}
-	return (result);
+	dest[dest_index] = '\0';
 }
 
 size_t	ft_strlen(const char *s)
@@ -86,16 +69,4 @@ size_t	ft_strlen(const char *s)
 		index++;
 	}
 	return (index);
-}
-
-long	time_calc_from_start(t_arg *arg)
-{
-	t_timeval	time_lapse;
-	long		result;
-
-	if (gettimeofday(&time_lapse, T_NULL) != 0)
-		return (-1);
-	result = (time_lapse.tv_sec - arg->start.tv_sec) * S_TO_US
-		+ (time_lapse.tv_usec - arg->start.tv_usec);
-	return (result);
 }

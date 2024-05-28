@@ -21,11 +21,7 @@ t_bool	report(t_philo *value, t_philo_status status, t_arg *arg)
 	log = (t_log *)malloc(sizeof(t_log));
 	if (log == T_NULL)
 		return (FALSE);
-	if (gettimeofday(&log->time, T_NULL) != 0)
-	{
-		free(log);
-		return (FALSE);
-	}
+	gettimeofday(&log->time, T_NULL);
 	log->usec = time_calc(log->time, arg->start);
 	if (status == EATING)
 	{

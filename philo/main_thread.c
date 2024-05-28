@@ -85,9 +85,7 @@ inline static int	mutexes_init(t_arg *arg)
 			arg->philo_num, &arg->log_mtx_cnt) != 0)
 		return (main_thread_end(arg, arg->philo_num + 2,
 				"pthread mutex init error!"));
-	if (gettimeofday(&(arg->start), T_NULL) != 0)
-		return (main_thread_end(arg, arg->philo_num + 2,
-				"gettimeofday error!"));
+	gettimeofday(&(arg->start), T_NULL);
 	return (philosopher_end(arg));
 }
 

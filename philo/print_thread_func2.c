@@ -33,8 +33,7 @@ int	print_thread_func2(t_arg *arg, long time_offset)
 	eat_done_cnt = 0;
 	while (chk_end(arg) != ABORT && eat_done_cnt < arg->philo_num)
 	{
-		if (gettimeofday(&t_lapse, T_NULL) != 0)
-			return (1);
+		gettimeofday(&t_lapse, T_NULL);
 		log_collect(arg, &total_logs, time_offset, t_lapse);
 		if (total_logs.size == 0)
 			continue ;

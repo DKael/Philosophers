@@ -30,8 +30,7 @@ void	*time_thread_func(void *input_arg)
 	time_thrd_end = FALSE;
 	while (chk_end(arg) == NORMAL && time_thrd_end == FALSE)
 	{
-		if (gettimeofday(&time_lapse, T_NULL) != 0)
-			return (thread_error_end(arg));
+		gettimeofday(&time_lapse, T_NULL);
 		time_lapse_usec = time_calc(time_lapse, arg->start);
 		if (time_thread_func2(arg, time_lapse_usec, &time_thrd_end) == 1)
 			return (thread_error_end(arg));

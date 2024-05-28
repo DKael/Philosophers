@@ -53,83 +53,33 @@ t_bool	ft_isdecimal(char *str)
 	return (TRUE);
 }
 
-void	*ft_calloc(size_t count, size_t size)
-{
-	size_t	index;
-	size_t	total_size;
-	void	*result;
-	char	*temp_ptr;
-
-	index = 0;
-	if (count == 0 || size == 0)
-		return (malloc(0));
-	total_size = count * size;
-	if (ULLONG_MAX / size < count)
-		return ((T_NULL));
-	result = malloc(total_size);
-	if (result == T_NULL)
-		return (T_NULL);
-	temp_ptr = (char *)result;
-	while (index < total_size)
-	{
-		temp_ptr[index] = 0;
-		index++;
-	}
-	return (result);
-}
-
-t_bool	ft_usleep(long us)
+t_bool	ft_usleep(long us, t_timeval last_eat, int d_time)
 {
 	t_timeval	start;
 	t_timeval	t;
 	long		time_lapse;
 	long		sleep_time;
 
-	if (gettimeofday(&start, T_NULL) != 0 || gettimeofday(&t, T_NULL) != 0)
-		return (FALSE);
-	time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US
-		+ (t.tv_usec - start.tv_usec);
-	sleep_time = us;
+	sleep_time = 10000;
+	gettimeofday(&start, T_NULL);
+	time_lapse = 0;
 	while (time_lapse < us)
 	{
-		if (sleep_time >= 20)
+		if (sleep_time >= 100)
 			sleep_time /= 5;
 		else
-			sleep_time = 10;
-		if (usleep(sleep_time) != 0)
-			printf("usleep function is interrupted by a signal\n");
-		if (gettimeofday(&t, T_NULL) != 0)
+			sleep_time = 100;
+		usleep(sleep_time);
+		gettimeofday(&t, T_NULL);
+		if (time_calc(t, last_eat) > d_time * MS_TO_US)
 			return (FALSE);
-		time_lapse = (t.tv_sec - start.tv_sec) * S_TO_US
-			+ (t.tv_usec - start.tv_usec);
+		time_lapse = time_calc(t, start);
 	}
 	return (TRUE);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+inline long	time_calc(t_timeval t1, t_timeval t2)
 {
-	size_t	s1_size;
-	size_t	s2_size;
-	size_t	index;
-	char	*result;
-
-	s1_size = ft_strlen(s1);
-	s2_size = ft_strlen(s2);
-	result = (char *)malloc(sizeof(char) * (s1_size + s2_size + 1));
-	if (result == NULL)
-		return (NULL);
-	index = 0;
-	while (index < s1_size)
-	{
-		result[index] = s1[index];
-		index++;
-	}
-	index = 0;
-	while (index < s2_size)
-	{
-		result[s1_size + index] = s2[index];
-		index++;
-	}
-	result[s1_size + index] = '\0';
-	return (result);
+	return ((t1.tv_sec - t2.tv_sec) * S_TO_US
+		+ (t1.tv_usec - t2.tv_usec));
 }

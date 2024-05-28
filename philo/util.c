@@ -88,8 +88,7 @@ t_bool	ft_usleep(long us, t_arg *arg)
 	sleep_time = us;
 	if (sleep_time > 5000000)
 		sleep_time = 5000000;
-	if (gettimeofday(&start, T_NULL) != 0)
-		return (FALSE);
+	gettimeofday(&start, T_NULL);
 	time_lapse = 0;
 	while (time_lapse < us)
 	{
@@ -98,8 +97,9 @@ t_bool	ft_usleep(long us, t_arg *arg)
 		else
 			sleep_time = 10;
 		usleep(sleep_time);
-		if (chk_end(arg) != NORMAL || gettimeofday(&t, T_NULL) != 0)
+		if (chk_end(arg) != NORMAL)
 			return (FALSE);
+		gettimeofday(&t, T_NULL);
 		time_lapse = time_calc(t, start);
 	}
 	return (TRUE);

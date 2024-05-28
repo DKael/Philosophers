@@ -1,35 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   resource_free_func_bonus.c                         :+:      :+:    :+:   */
+/*   wait_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/21 19:33:08 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/08/27 16:17:40 by hyungdki         ###   ########.fr       */
+/*   Created: 2023/08/14 16:58:56 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/08/27 20:13:28 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
 
-void	kill_and_waitpid(t_arg *arg, int cnt)
+inline int	ft_wifexited(int status)
 {
-	int	idx;
-
-	idx = -1;
-	while (++idx < cnt)
-	{
-		kill(arg->pid_lst[idx], SIGKILL);
-		waitpid(arg->pid_lst[idx], T_NULL, 0);
-	}
+	return (((*(int *)&(status)) & 0177) == 0);
 }
 
-void	arg_sems_destroy(t_arg *arg)
+inline int	ft_wexitstatus(int status)
 {
-	if (arg->fork_chk == TRUE)
-		ft_sem_destroy(&arg->fork);
-	if (arg->start_flag_chk == TRUE)
-		ft_sem_destroy(&arg->start_flag);
-	if (arg->print_sem_chk == TRUE)
-		ft_sem_destroy(&arg->print_sem);
+	return (((*(int *)&(status)) >> 8) & 0x000000ff);
+}
+
+inline int	ft_wifsignaled(int status)
+{
+	int	tmp;
+
+	tmp = ((*(int *)&(status)) & 0177);
+	return (tmp != 0177 && tmp != 0);
 }

@@ -39,27 +39,3 @@ sem_t	*ft_sem_open(const char *name, mode_t mode, unsigned int value)
 	}
 	return (temp);
 }
-
-int	make_multiple_sem(t_csem *lst, const char *name, int *cnt, int num)
-{
-	char	*temp;
-
-	*cnt = -1;
-	while (++(*cnt) < num)
-	{
-		temp = ft_itoa((*cnt));
-		if (temp == T_NULL)
-			return (1);
-		lst[(*cnt)].name = ft_strjoin(name, temp);
-		free(temp);
-		if (lst[(*cnt)].name == T_NULL)
-			return (1);
-		lst[(*cnt)].sem = ft_sem_open(lst[(*cnt)].name, 0644, 1);
-		if (lst[(*cnt)].sem == SEM_FAILED)
-		{
-			free(lst[(*cnt)].name);
-			return (1);
-		}	
-	}
-	return (0);
-}

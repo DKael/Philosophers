@@ -16,10 +16,10 @@ SRCS =	main_bonus.c \
 		init_bonus.c \
 		main_process_bonus.c \
 		philo_process_bonus.c \
-		philo_time_thread_func_bonus.c\
 		resource_free_func_bonus.c \
 		util1_bonus.c \
 		util2_bonus.c \
+		wait_bonus.c
 		
 OBJS = 	${SRCS:.c=.o}
 

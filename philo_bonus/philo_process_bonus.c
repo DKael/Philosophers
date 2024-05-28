@@ -12,26 +12,35 @@
 
 #include "philosophers_bonus.h"
 
-static void	philo_thread_func2(t_arg *arg, t_philo *data);
-static void	philo_init(t_philo *data, int idx);
+static void		philo_thread_func2(t_arg *arg, t_philo *data);
+static int		philo_thread_func3(t_arg *arg, t_philo *data);
+static t_bool	death_chk(t_arg *arg, t_philo *data);
+static void		philo_report(t_arg *arg, t_philo *data, t_philo_status status);
 
 void	philo_process_func(t_arg *arg, int idx)
 {
 	t_philo			data;
-	t_arg_and_philo	to_time_func;
 
-	philo_init(&data, idx);
-	to_time_func.arg = arg;
-	to_time_func.philo = &data;
-	if (pthread_create(&data.time_thrd, T_NULL,
-			time_thread_func, &to_time_func) != 0)
-		philo_process_end(arg);
+	data.idx = idx;
+	data.eat_cnt = 0;
 	sem_wait_nointr(arg->start_flag.sem);
 	if (sem_post(arg->start_flag.sem) != 0)
-		philo_process_end(arg);
-	if (data.idx % 2 == 0 && usleep(arg->philo_num * 10) != 0)
-		philo_process_end(arg);
+	{
+		sem_wait_nointr(arg->print_sem.sem);
+		exit(1);
+	}
+	gettimeofday(&data.last_eat, T_NULL);
+	if (arg->philo_num == 1)
+	{
+		philo_report(arg, &data, GET_FORK);
+		while (death_chk(arg, &data) == FALSE)
+			;
+		philo_report(arg, &data, DIE);
+	}
+	if (data.idx % 2 == 0)
+		usleep(2000);
 	philo_thread_func2(arg, &data);
+	exit(0);
 }
 
 static void	philo_thread_func2(t_arg *arg, t_philo *data)
@@ -39,57 +48,83 @@ static void	philo_thread_func2(t_arg *arg, t_philo *data)
 	while (1)
 	{
 		sem_wait_nointr(arg->fork.sem);
+		if (death_chk(arg, data) == TRUE)
+			philo_report(arg, data, DIE);
+		else
+			philo_report(arg, data, GET_FORK);
 		sem_wait_nointr(arg->fork.sem);
-		philo_report(arg, data, GET_FORK);
-		philo_report(arg, data, EATING);
-		if (ft_usleep(arg->e_time * MS_TO_US) == FALSE)
-			philo_process_end(arg);
-		if (sem_post(arg->fork.sem) != 0 || sem_post(arg->fork.sem) != 0)
-			philo_process_end(arg);
-		if (arg->have_to_eat != -1 && ++(data->eat_cnt) == arg->have_to_eat)
+		if (death_chk(arg, data) == TRUE)
+			philo_report(arg, data, DIE);
+		else
+			philo_report(arg, data, GET_FORK);
+		if (death_chk(arg, data) == TRUE)
+			philo_report(arg, data, DIE);
+		else
+			philo_report(arg, data, EATING);
+		if (philo_thread_func3(arg, data) == 1)
 			break ;
-		philo_report(arg, data, SLEEPING);
-		if (ft_usleep(arg->s_time * MS_TO_US) == FALSE)
-			philo_process_end(arg);
-		philo_report(arg, data, THINKING);
-		if (arg->philo_num % 2 == 1)
-			usleep(arg->philo_num * 4);
 	}
 	exit(0);
 }
 
-static void	philo_init(t_philo *data, int idx)
+static int	philo_thread_func3(t_arg *arg, t_philo *data)
 {
-	data->idx = idx;
-	data->last_eat = 0;
-	data->eat_cnt = 0;
-}
-
-void	philo_process_end(t_arg *arg)
-{
-	sem_wait_nointr(arg->print_sem.sem);
-	exit(1);
-}
-
-void	philo_report(t_arg *arg, t_philo *data, t_philo_status status)
-{
-	long	time;
-
-	sem_wait_nointr(arg->print_sem.sem);
-	time = time_calc_from_start(arg);
-	if (time == -1)
-		exit(1);
-	if (status == GET_FORK)
-		printf("%ld %d has taken a fork\n", time / 1000, data->idx + 1);
-	else if (status == EATING)
+	if (ft_usleep(arg->e_time * MS_TO_US, data->last_eat, arg->d_time) == FALSE)
+		philo_report(arg, data, DIE);
+	if (sem_post(arg->fork.sem) != 0 || sem_post(arg->fork.sem) != 0)
 	{
-		data->last_eat = time;
-		printf("%ld %d is eating\n", time / 1000, data->idx + 1);
+		sem_wait_nointr(arg->print_sem.sem);
+		exit(1);
 	}
+	if (arg->have_to_eat != -1 && ++(data->eat_cnt) == arg->have_to_eat)
+		return (1);
+	if (death_chk(arg, data) == TRUE)
+		philo_report(arg, data, DIE);
+	else
+		philo_report(arg, data, SLEEPING);
+	if (ft_usleep(arg->s_time * MS_TO_US, data->last_eat, arg->d_time) == FALSE)
+		philo_report(arg, data, DIE);
+	if (death_chk(arg, data) == TRUE)
+		philo_report(arg, data, DIE);
+	else
+		philo_report(arg, data, THINKING);
+	return (0);
+}
+
+static t_bool	death_chk(t_arg *arg, t_philo *data)
+{
+	t_timeval	chk_time;
+
+	gettimeofday(&chk_time, T_NULL);
+	if (time_calc(chk_time, data->last_eat) > arg->d_time * MS_TO_US)
+		return (TRUE);
+	return (FALSE);
+}
+
+static void	philo_report(t_arg *arg, t_philo *data, t_philo_status status)
+{
+	t_timeval	time;
+	char		buf[BUF_SIZE];
+	int			len;
+
+	gettimeofday(&time, T_NULL);
+	if (status == EATING)
+		data->last_eat = time;
+	len = ft_itoa(time_calc(time, arg->start) / 1000, buf);
+	buf[len++] = ' ';
+	len += ft_itoa(data->idx + 1, &buf[len]);
+	if (status == GET_FORK)
+		ft_strcat(&buf[len], " has taken a fork\n");
+	else if (status == EATING)
+		ft_strcat(&buf[len], " is eating\n");
 	else if (status == SLEEPING)
-		printf("%ld %d is sleeping\n", time / 1000, data->idx + 1);
+		ft_strcat(&buf[len], " is sleeping\n");
 	else if (status == THINKING)
-		printf("%ld %d is thinking\n", time / 1000, data->idx + 1);
-	if (sem_post(arg->print_sem.sem) != 0)
+		ft_strcat(&buf[len], " is thinking\n");
+	else if (status == DIE)
+		ft_strcat(&buf[len], " died\n");
+	sem_wait_nointr(arg->print_sem.sem);
+	write(1, buf, ft_strlen(buf));
+	if (status == DIE || sem_post(arg->print_sem.sem) != 0)
 		exit(1);
 }

@@ -26,6 +26,10 @@ int	arg_init(t_arg *arg, int argc, char **argv)
 			return (err_msg(arg, "Invalid input! Input must be number.", 1));
 		if (argv[idx][0] == '-')
 			return (err_msg(arg, "Invalid input! Input must be positive.", 1));
+		if ((argv[idx][0] == '+' && argv[idx][1] == '0')
+			|| argv[idx][0] == '0')
+			return (err_msg(arg,
+					"Invalid input! Input must not start with 0.", 1));
 	}
 	arg->philo_num = ft_atoi_int(argv[1]);
 	if (arg->philo_num == 0 && argv[1][0] != '0')
@@ -36,14 +40,14 @@ int	arg_init(t_arg *arg, int argc, char **argv)
 	arg->e_time = ft_atoi_int(argv[3]);
 	if (arg->e_time == 0 && argv[3][0] != '0')
 		return (err_msg(arg, "Invalid input! Wrong range of input value.", 1));
-	arg->s_time = ft_atoi_int(argv[4]);
-	if (arg->s_time == 0 && argv[4][0] != '0')
-		return (err_msg(arg, "Invalid input! Wrong range of input value.", 1));
 	return (arg_init2(arg, argc, argv));
 }
 
 static int	arg_init2(t_arg *arg, int argc, char **argv)
 {
+	arg->s_time = ft_atoi_int(argv[4]);
+	if (arg->s_time == 0 && argv[4][0] != '0')
+		return (err_msg(arg, "Invalid input! Wrong range of input value.", 1));
 	arg->have_to_eat = -1;
 	if (argc == 6)
 	{
@@ -55,17 +59,9 @@ static int	arg_init2(t_arg *arg, int argc, char **argv)
 	arg->fork_chk = FALSE;
 	arg->start_flag_chk = FALSE;
 	arg->print_sem_chk = FALSE;
-	arg->last_eat_sem = T_NULL;
-	arg->last_eat_sem_cnt = -1;
 	arg->pid_lst = T_NULL;
-	arg->last_eat_sem = (t_csem *)malloc(sizeof(t_csem) * arg->philo_num);
-	if (arg->last_eat_sem == T_NULL)
-		return (err_msg(arg, "malloc error!", 1));
 	arg->pid_lst = (pid_t *)malloc(sizeof(pid_t) * arg->philo_num);
 	if (arg->pid_lst == T_NULL)
-	{
-		arg_heap_free(arg);
 		return (err_msg(arg, "malloc error!", 1));
-	}
 	return (0);
 }
