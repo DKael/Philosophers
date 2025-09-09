@@ -74,8 +74,8 @@ Mandatory는 pthread와 mutex를 이용한 멀티스레드 구현, Bonus는 fork
 bash
 ```
 # 빌드
-make        # mandatory
-make bonus  # bonus
+make        # mandatory, at directory philo
+make bonus  # bonus, at directory philo_bonus
 
 # 실행 형식
 ./philo number_of_philos time_to_die time_to_eat time_to_sleep [must_eat]
@@ -90,9 +90,189 @@ make bonus  # bonus
 * must_eat 옵션 지정 시, 모든 철학자가 지정 횟수 이상 먹으면 종료
 * 철학자 중 하나라도 time_to_die 초과 시 즉시 종료
 
- ---
+---
+
+ ## 7️⃣ 출력 예시 사진
  
- ## 7️⃣ 기술 스택
+<img width="1855" height="729" alt="Philosophers_visualize" src="https://github.com/user-attachments/assets/34daa64d-1deb-415b-884a-df71503608d6" />
+
+bash
+```
+./philo 5 800 200 200 7 > test.txt
+```
+
+<test.txt>
+```
+0 2 has taken a fork
+0 2 has taken a fork
+0 2 is eating
+0 4 has taken a fork
+0 4 has taken a fork
+0 4 is eating
+0 1 has taken a fork
+200 2 is sleeping
+200 1 has taken a fork
+200 3 has taken a fork
+200 1 is eating
+200 4 is sleeping
+200 3 has taken a fork
+200 3 is eating
+200 5 has taken a fork
+400 1 is sleeping
+400 5 has taken a fork
+400 5 is eating
+400 3 is sleeping
+400 2 is thinking
+400 4 is thinking
+400 2 has taken a fork
+400 2 has taken a fork
+400 2 is eating
+400 4 has taken a fork
+600 4 has taken a fork
+600 4 is eating
+600 5 is sleeping
+600 1 is thinking
+600 3 is thinking
+600 2 is sleeping
+600 1 has taken a fork
+600 1 has taken a fork
+600 1 is eating
+600 3 has taken a fork
+800 5 is thinking
+800 4 is sleeping
+800 3 has taken a fork
+800 3 is eating
+800 5 has taken a fork
+800 2 is thinking
+800 1 is sleeping
+800 5 has taken a fork
+800 5 is eating
+800 2 has taken a fork
+1000 4 is thinking
+1000 3 is sleeping
+1000 2 has taken a fork
+1000 2 is eating
+1000 1 is thinking
+1000 4 has taken a fork
+1000 5 is sleeping
+1000 4 has taken a fork
+1000 4 is eating
+1000 1 has taken a fork
+1200 3 is thinking
+1200 2 is sleeping
+1200 1 has taken a fork
+1200 1 is eating
+1200 4 is sleeping
+1200 5 is thinking
+1200 3 has taken a fork
+1200 3 has taken a fork
+1200 3 is eating
+1200 5 has taken a fork
+1400 4 is thinking
+1400 2 is thinking
+1400 1 is sleeping
+1400 5 has taken a fork
+1400 5 is eating
+1400 3 is sleeping
+1400 4 has taken a fork
+1400 2 has taken a fork
+1400 2 has taken a fork
+1400 2 is eating
+1600 1 is thinking
+1600 5 is sleeping
+1600 3 is thinking
+1600 4 has taken a fork
+1600 4 is eating
+1600 2 is sleeping
+1600 1 has taken a fork
+1600 1 has taken a fork
+1600 1 is eating
+1600 3 has taken a fork
+1800 4 is sleeping
+1800 5 is thinking
+1800 3 has taken a fork
+1800 3 is eating
+1800 2 is thinking
+1800 1 is sleeping
+1800 5 has taken a fork
+1800 5 has taken a fork
+1800 5 is eating
+1800 2 has taken a fork
+2000 4 is thinking
+2000 2 has taken a fork
+2000 3 is sleeping
+2000 2 is eating
+2000 5 is sleeping
+2000 1 is thinking
+2000 4 has taken a fork
+2000 4 has taken a fork
+2000 4 is eating
+2000 1 has taken a fork
+2200 3 is thinking
+2200 2 is sleeping
+2200 1 has taken a fork
+2200 1 is eating
+2200 5 is thinking
+2200 4 is sleeping
+2200 3 has taken a fork
+2200 3 has taken a fork
+2200 3 is eating
+2200 5 has taken a fork
+2400 2 is thinking
+2400 1 is sleeping
+2400 5 has taken a fork
+2400 5 is eating
+2400 4 is thinking
+2400 2 has taken a fork
+2400 3 is sleeping
+2400 2 has taken a fork
+2400 2 is eating
+2400 4 has taken a fork
+2600 1 is thinking
+2600 5 is sleeping
+2600 4 has taken a fork
+2600 4 is eating
+2600 1 has taken a fork
+2600 2 is sleeping
+2600 3 is thinking
+2600 1 has taken a fork
+2600 1 is eating
+2600 3 has taken a fork
+2800 5 is thinking
+2800 4 is sleeping
+2800 3 has taken a fork
+2800 3 is eating
+2800 1 is sleeping
+2800 2 is thinking
+2800 5 has taken a fork
+2800 5 has taken a fork
+2800 5 is eating
+2800 2 has taken a fork
+3000 4 is thinking
+3000 3 is sleeping
+3000 2 has taken a fork
+3000 2 is eating
+3000 4 has taken a fork
+3000 1 is thinking
+3000 5 is sleeping
+3000 4 has taken a fork
+3000 4 is eating
+3000 1 has taken a fork
+3200 3 is thinking
+3200 1 has taken a fork
+3200 1 is eating
+3200 3 has taken a fork
+3200 3 has taken a fork
+3200 3 is eating
+3200 5 is thinking
+3200 5 has taken a fork
+3400 5 has taken a fork
+3400 5 is eating
+```
+
+---
+ 
+ ## 8️⃣ 기술 스택
 	•	언어: C
  	•	운영체제/환경: Unix/Linux
  	•	빌드 도구: GNU Make
@@ -102,3 +282,6 @@ make bonus  # bonus
 	•	프로세스 동기화: fork, sem_open/close/unlink, waitpid, kill
 	•	타이밍 제어: usleep, gettimeofday, clock_gettime
 	•	기타: write, malloc/free
+
+## 9️⃣ Philosophers visualizer
+- https://rom98759.github.io/Philosophers-visualizer/
