@@ -30,6 +30,9 @@ Mandatory는 pthread와 mutex를 이용한 멀티스레드 구현, Bonus는 fork
   - 각 자식 프로세스에서 death monitor를 두어 부모가 전체 종료 관리
   - waitpid, kill, sem_close/unlink로 자원 해제 및 정리
 
+---
+
+## 4️⃣ 다른 학습자와의 차별점
 * 차별화된 출력 구조
   - 다른 구현: 각 철학자가 printf 직전에 mutex를 걸어 출력
   - 내 구현: 출력 전담 스레드를 두어 모든 로그를 큐에 기록 후
@@ -41,7 +44,7 @@ Mandatory는 pthread와 mutex를 이용한 멀티스레드 구현, Bonus는 fork
 
 ---
 
-## 4️⃣ 배운 점
+## 5️⃣ 배운 점
 * 데드락 방지 기법
   - 교차 집기, N-1 제한, 모니터 스레드 방식 실험
   - 자원 접근 순서를 통제하는 것의 중요성 체득
@@ -67,7 +70,7 @@ Mandatory는 pthread와 mutex를 이용한 멀티스레드 구현, Bonus는 fork
 
 ---
 
-## 5️⃣ 사용 방법
+## 6️⃣ 사용 방법
 bash
 ```
 # 빌드
@@ -89,7 +92,7 @@ make bonus  # bonus
 
  ---
  
- ## 6️⃣ 기술 스택
+ ## 7️⃣ 기술 스택
 	•	언어: C
  	•	운영체제/환경: Unix/Linux
  	•	빌드 도구: GNU Make
